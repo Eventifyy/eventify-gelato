@@ -2,7 +2,7 @@ import SocialLogin from "@biconomy/web3-auth";
 import { ChainId } from "@biconomy/core-types";
 import SmartAccount from "@biconomy/smart-account";
 import "@biconomy/web3-auth/dist/src/style.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ethers } from "ethers";
 import { address, abi } from "../config";
 
@@ -12,6 +12,7 @@ export default function Login() {
     const [smartAcc, setSmartAcc] = useState(); //this to host
     const [eAddress, setEAddress] = useState();
     const [sAddress, setSAddress] = useState(); //this to dashboard
+    const [userInfo, setUserInfo] = useState(null); //this to dashboard
 
     useEffect(() => {
         initiate();
@@ -54,10 +55,19 @@ export default function Login() {
         setSmartAcc(null);
         setEAddress(null);
         setSAddress(null);
+        setUserInfo(null)
         window.getSocialLoginSDK = null;
         sdk.hideWallet();
         sdk(null);
     }
+
+    const getUserInfo = useCallback(async () => {
+        if (sdk) {
+            const userInfo = await sdk.getUserInfo();
+            console.log("userInfo", userInfo);
+            setUserInfo(userInfo);
+        }
+    }, [sdk]);
 
     async function getSmartAccount() {
         console.log("started");
@@ -218,7 +228,8 @@ export default function Login() {
         initiateTx();
     }
     function debug4() {
-        mint();
+        // mint()
+        getUserInfo();
     }
     //
 

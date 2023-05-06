@@ -49,11 +49,14 @@ export default function Events() {
         console.log(itemsFetched);
     }
 
+    async function claim(prop) {}
+
     function Card(prop) {
 
         const date = new Date(prop.date);
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         const formattedDate = date.toLocaleDateString(undefined, options);  
+    
 
         return (
             <div>

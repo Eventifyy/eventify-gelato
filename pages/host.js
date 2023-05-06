@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { useState } from "react";
 import { Web3Storage } from "web3.storage";
-import { address, abi } from "../config";
+import { address } from "../config";
 import { ethers } from "ethers";
 
 export default function Host() {
