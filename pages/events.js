@@ -8,6 +8,8 @@ import Link from "next/link";
 export default function Events() {
     const [items, setItems] = useState([]);
 
+    const [smartAcc, setSmartAcc] = useState();
+
     useEffect(() => {
         fetchEvents();
     }, []);
@@ -49,14 +51,55 @@ export default function Events() {
         console.log(itemsFetched);
     }
 
-    async function claim(prop) {}
+    async function claim(prop) {
+        //
+        console.log("started");
+
+        const _ticketId = prop.tokenId;
+
+        const erc20Interface = new ethers.utils.Interface([
+            "function claimTicket(uint256 _ticketId)",
+        ]);
+
+        const data = erc20Interface.encodeFunctionData("claimTicket", [
+            _ticketId,
+        ]);
+
+        const tx1 = {
+            to: address,
+            data,
+        };
+
+        smartAcc.on("txHashGenerated", (response) => {
+            console.log("txHashGenerated event received via emitter", response);
+        });
+        smartAcc.on("onHashChanged", (response) => {
+            console.log("onHashChanged event received via emitter", response);
+        });
+        smartAcc.on("txMined", (response) => {
+            console.log("txMined event received via emitter", response);
+        });
+        smartAcc.on("error", (response) => {
+            console.log("error event received via emitter", response);
+        });
+
+        // Sending gasless transaction
+        const txResponse = await smartAcc.sendTransaction({
+            transaction: tx1,
+        });
+        console.log("userOp hash", txResponse.hash);
+
+        const txReceipt = await txResponse.wait();
+        console.log("Tx hash", txReceipt.transactionHash);
+
+        console.log("done");
+        //
+    }
 
     function Card(prop) {
-
         const date = new Date(prop.date);
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        const formattedDate = date.toLocaleDateString(undefined, options);  
-    
+        const options = { year: "numeric", month: "long", day: "numeric" };
+        const formattedDate = date.toLocaleDateString(undefined, options);
 
         return (
             <div>
@@ -87,7 +130,12 @@ export default function Events() {
                             {prop.description}
                         </p>
 
-                            <button>Claim</button>
+                        <div
+                            onClick={() => claim(prop)}
+                            className=" inline-flex items-center justify-center rounded-md border border-transparent bg-[#8A42D8] px-2 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+                        >
+                            <p>Claim</p>
+                        </div>
                     </div>
                 </div>
             </div>

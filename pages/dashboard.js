@@ -5,10 +5,10 @@ import { ethers } from "ethers";
 import axios from "axios";
 
 export default function Dashboard() {
+    const [items, setItems] = useState([]);
+
     const [sAddress, setSAddress] = useState();
     const [userInfo, setUserInfo] = useState();
-
-    const [items, setItems] = useState([]);
 
     useEffect(() => {
         fetchDashboard();

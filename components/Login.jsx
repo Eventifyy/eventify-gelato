@@ -9,7 +9,7 @@ import { address, abi } from "../config";
 export default function Login() {
     const [sdk, setSdk] = useState();
     const [wProvider, setWProvider] = useState();
-    const [smartAcc, setSmartAcc] = useState(); //this to host
+    const [smartAcc, setSmartAcc] = useState(); //this to host, events
     const [eAddress, setEAddress] = useState();
     const [sAddress, setSAddress] = useState(); //this to dashboard
     const [userInfo, setUserInfo] = useState(null); //this to dashboard
