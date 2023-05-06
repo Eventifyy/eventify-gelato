@@ -1,8 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
 import { useState } from "react";
-import { Web3Storage } from 'web3.storage'
+import { Web3Storage } from "web3.storage";
+import { address, abi } from "../config";
+import { ethers } from "ethers";
 
 export default function Host() {
-    
     const [formInput, setFormInput] = useState({
         price: "",
         name: "",
@@ -13,6 +15,8 @@ export default function Host() {
         supply: "",
     });
     const [imgBase64, setImgBase64] = useState(null);
+
+    const [smartAcc, setSmartAcc] = useState();
 
     //
 
@@ -71,6 +75,57 @@ export default function Host() {
             console.log("Error uploading:", error);
         }
     };
+
+    //
+
+    async function mint() {
+        console.log("started");
+
+        const uri = await metadata()
+
+        const _price = formInput.price;
+        const _supply = formInput.supply;
+        const _tokenURI = uri;
+
+        const erc20Interface = new ethers.utils.Interface([
+            "function host(uint _price, uint _supply, string memory _tokenURI)",
+        ]);
+
+        const data = erc20Interface.encodeFunctionData("transfer", [
+            _price,
+            _supply,
+            _tokenURI,
+        ]);
+
+        const tx1 = {
+            to: address,
+            data,
+        };
+
+        smartAcc.on("txHashGenerated", (response) => {
+            console.log("txHashGenerated event received via emitter", response);
+        });
+        smartAcc.on("onHashChanged", (response) => {
+            console.log("onHashChanged event received via emitter", response);
+        });
+        smartAcc.on("txMined", (response) => {
+            console.log("txMined event received via emitter", response);
+        });
+        smartAcc.on("error", (response) => {
+            console.log("error event received via emitter", response);
+        });
+
+        // Sending gasless transaction
+        const txResponse = await smartAcc.sendTransaction({
+            transaction: tx1,
+        });
+        console.log("userOp hash", txResponse.hash);
+
+        const txReceipt = await txResponse.wait();
+        console.log("Tx hash", txReceipt.transactionHash);
+
+        console.log("done");
+    }
 
     //
 
@@ -211,6 +266,19 @@ export default function Host() {
                         required
                     />
                 </div>
+
+                <button
+                    onClick={mint}
+                    className="flex flex-row justify-center items-center
+                  w-full text-white text-md bg-[#8A42D8]
+                  py-2 px-5 rounded-full
+                  drop-shadow-xl border border-transparent
+                  hover:bg-transparent hover:text-[#8A42D8]
+                  hover:border hover:bg-indigo-700
+                  focus:outline-none focus:ring mt-5"
+                >
+                    Host Event
+                </button>
             </div>
         </div>
     );

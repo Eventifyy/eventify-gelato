@@ -4,13 +4,14 @@ import SmartAccount from "@biconomy/smart-account";
 import "@biconomy/web3-auth/dist/src/style.css";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
+import { address, abi } from "../config";
 
 export default function Login() {
     const [sdk, setSdk] = useState();
     const [wProvider, setWProvider] = useState();
-    const [smartAcc, setSmartAcc] = useState();
+    const [smartAcc, setSmartAcc] = useState(); //this to host
     const [eAddress, setEAddress] = useState();
-    const [sAddress, setSAddress] = useState();
+    const [sAddress, setSAddress] = useState(); //this to dashboard
 
     useEffect(() => {
         initiate();
@@ -61,6 +62,9 @@ export default function Login() {
     async function getSmartAccount() {
         console.log("started");
 
+        const INFURA_ID = process.env.NEXT_PUBLIC_INFURA
+        const biconomyAPI= process.env.NEXT_PUBLIC_BiconomyAPI
+
         let options = {
             activeNetworkId: ChainId.POLYGON_MUMBAI,
             supportedNetworksIds: [
@@ -73,8 +77,8 @@ export default function Login() {
                     chainId: ChainId.POLYGON_MUMBAI,
                     // Dapp API Key you will get from new Biconomy dashboard that will be live soon
                     // Meanwhile you can use the test dapp api key mentioned above
-                    dappAPIKey: `XgEQygbsd.f88d0281-18a8-400a-a2d3-96feee91df8a`,
-                    providerUrl: `https://polygon-mumbai.g.alchemy.com/v2/y-OHK68UTXZAj8NQU8Knz2bTee5IHXqP`,
+                    dappAPIKey: biconomyAPI,
+                    providerUrl: `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`,
                 },
                 // {
                 //     chainId: ChainId.POLYGON_MAINNET,
@@ -152,8 +156,57 @@ export default function Login() {
         // DONE! You just sent a forward transaction
         console.log("done");
     }
-
     //
+
+    // 
+    async function mint() {
+        console.log("started");
+
+        const _price = 10;
+        const _supply = 10;
+        const _tokenURI = `superb!`;
+
+        const erc20Interface = new ethers.utils.Interface([
+            "function host(uint _price, uint _supply, string memory _tokenURI)",
+        ]);
+
+        const data = erc20Interface.encodeFunctionData("host", [
+            _price,
+            _supply,
+            _tokenURI,
+        ]);
+
+        const tx1 = {
+            to: address,
+            data,
+        };
+
+        smartAcc.on("txHashGenerated", (response) => {
+            console.log("txHashGenerated event received via emitter", response);
+        });
+        smartAcc.on("onHashChanged", (response) => {
+            console.log("onHashChanged event received via emitter", response);
+        });
+        smartAcc.on("txMined", (response) => {
+            console.log("txMined event received via emitter", response);
+        });
+        smartAcc.on("error", (response) => {
+            console.log("error event received via emitter", response);
+        });
+
+        // Sending gasless transaction
+        const txResponse = await smartAcc.sendTransaction({
+            transaction: tx1,
+        });
+        console.log("userOp hash", txResponse.hash);
+
+        const txReceipt = await txResponse.wait();
+        console.log("Tx hash", txReceipt.transactionHash);
+
+        console.log("done");
+    }
+    // 
+
     function debug1() {
         connect();
     }
@@ -162,6 +215,9 @@ export default function Login() {
     }
     function debug3() {
         initiateTx();
+    }
+    function debug4() {
+        mint();
     }
     //
 
@@ -172,6 +228,7 @@ export default function Login() {
                 <button onClick={debug1}>Test 1</button>
                 <button onClick={debug2}>Test 1</button>
                 <button onClick={debug3}>Test 1</button>
+                <button onClick={debug4}>Test 4</button>
             </div>
             <p>e: {eAddress}</p>
             <p>s: {sAddress}</p>
