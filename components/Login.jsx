@@ -63,6 +63,7 @@ export default function Login() {
         console.log("started");
 
         const INFURA_ID = process.env.NEXT_PUBLIC_INFURA
+        const ALCHEMY_ID = process.env.NEXT_PUBLIC_ALCHEMY;
         const biconomyAPI= process.env.NEXT_PUBLIC_BiconomyAPI
 
         let options = {
@@ -78,7 +79,7 @@ export default function Login() {
                     // Dapp API Key you will get from new Biconomy dashboard that will be live soon
                     // Meanwhile you can use the test dapp api key mentioned above
                     dappAPIKey: biconomyAPI,
-                    providerUrl: `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`,
+                    providerUrl: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
                 },
                 // {
                 //     chainId: ChainId.POLYGON_MAINNET,
