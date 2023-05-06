@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 const LoginWrapper = () => {
   const SocialLoginDynamic = dynamic(
-    () => import("../components/Login").then((res) => res.default),
+    () => import("./Login").then((res) => res.default),
     {
       ssr: false,
     }
