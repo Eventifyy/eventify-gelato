@@ -18,6 +18,7 @@ export default function Login() {
         initiate();
     }, []);
 
+
     async function initiate() {
         const socialLoginSDK = new SocialLogin();
         const signature = await socialLoginSDK.whitelistUrl(
@@ -41,6 +42,7 @@ export default function Login() {
         setWProvider(provider);
         setEAddress(accounts);
         sdk.hideWallet();
+        getUserInfo()
 
         console.log("done");
     }
@@ -118,11 +120,11 @@ export default function Login() {
         console.log("started");
 
         const recipientAddress = `0x48e6a467852Fa29710AaaCDB275F85db4Fa420eB`;
-        const calculateAmount = 10 * Math.pow(10, 18);
-        const amount = `${calculateAmount}`;
+        const calculatedAmount = 10 * Math.pow(10, 18);
+        const amount = `${calculatedAmount}`
         const usdcAddress = `0xE73305E0727b615592f54432873592792ccdBfFa`;
 
-        console.log(calculateAmount);
+        console.log(amount);
 
         const erc20Interface = new ethers.utils.Interface([
             "function transfer(address _to, uint256 _value)",
@@ -174,7 +176,7 @@ export default function Login() {
         console.log("started");
 
         const _price = 10;
-        const _supply = 10;
+        const _supply = 40;
         const _tokenURI = `superb!`;
 
         const erc20Interface = new ethers.utils.Interface([
@@ -228,8 +230,8 @@ export default function Login() {
         initiateTx();
     }
     function debug4() {
-        // mint()
-        getUserInfo();
+        mint()
+        // getUserInfo();
     }
     //
 
@@ -237,10 +239,10 @@ export default function Login() {
         <div>
             {eAddress ? <button onClick={disconnect}>Logout</button> : <button onClick={connect}>Login</button>}
             <div className="flex gap-3">
-                <button onClick={debug1}>Test 1</button>
-                <button onClick={debug2}>Test 1</button>
-                <button onClick={debug3}>Test 1</button>
-                <button onClick={debug4}>Test 4</button>
+                <button onClick={debug1}>connect()</button>
+                <button onClick={debug2}>getSmartAccount()</button>
+                <button onClick={debug3}>transfer()</button>
+                <button onClick={debug4}>mint()</button>
             </div>
             <p>e: {eAddress}</p>
             <p>s: {sAddress}</p>
