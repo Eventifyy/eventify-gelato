@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Footer() {
     return (
-        <div className="hero-wrapper !h-auto  relative mt-4">
+        <div className="hero-wrapper bg-[#191919] mx-auto container rounded-3xl !h-auto  relative mt-4">
             <div className="relative mt-8 flex justify-between overflow-hidden rounded-[36px] p-8 ">
                 <img src="./logo.png" alt="" width="200px" />
 
