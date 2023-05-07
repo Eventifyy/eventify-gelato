@@ -95,12 +95,19 @@ export default function Dashboard() {
 
     return (
         <div>
-            <p>test</p>
-            <button onClick={fetchDashboard}>test fetching</button>
-            <img src={userInfo?.profileImage} alt="" />
-            <p>{userInfo?.name}</p>
-            <p>{userInfo?.email}</p>
-            <p>smart contract account : {sAddress}</p>
+            <div className="flex h-screen">
+                <div className=" flex-1">
+                    <h1>hello world</h1>
+                </div>
+                <div className="w-[475px] p-8 py-20 border-l border-l-gray-500 ">
+                    {/* <p>test</p>
+                    <button onClick={fetchDashboard}>test fetching</button> */}
+                    <img className="w-20 h-20 rounded-full" src={userInfo?.profileImage} alt="" />
+                    <p className="mt-3 text-lg capitalize ml-1">{userInfo?.name}</p>
+                    <p className="mt-1 text-lg ml-1">Email: {userInfo?.email}</p>
+                    <p className="mt-1 text-lg ml-1">Smart contract account : {sAddress}</p>
+                </div>
+            </div>
 
             <div>
                 {items.map((item, i) => (
