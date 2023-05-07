@@ -2,22 +2,23 @@ import SocialLogin from "@biconomy/web3-auth";
 import { ChainId } from "@biconomy/core-types";
 import SmartAccount from "@biconomy/smart-account";
 import "@biconomy/web3-auth/dist/src/style.css";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, memo } from "react";
 import { ethers } from "ethers";
 import { address, abi } from "../config";
 import { useDispatch, useSelector } from "react-redux";
 import { setSmartAcc, setUserInfo, setSAddress } from "../store/index.js"
 
-export default function Login() {
+function Login() {
     const dispatch = useDispatch()
     const [sdk, setSdk] = useState();
     const [wProvider, setWProvider] = useState();
-    const smartAcc = useSelector(state => state.login.smartAcc);
-    const sAddress = useSelector(state => state.login.sAddress);
-    const userInfo = useSelector(state => state.login.userInfo);
-    // const [smartAcc, setSmartAcc] = useState(); //this to host, events
+    // const smartAcc = useSelector(state => state.login.smartAcc);
+    // const sAddress = useSelector(state => state.login.sAddress);
+    // const userInfo = useSelector(state => state.login.userInfo);
+    const {smartAcc, sAddress, userInfo} = useSelector(state => state.login);
     const [eAddress, setEAddress] = useState();
-
+    
+    // const [smartAcc, setSmartAcc] = useState(); //this to host, events
     // const [sAddress, setSAddress] = useState(); //this to dashboard
     // const [userInfo, setUserInfo] = useState(null); //this to dashboard
 
@@ -270,3 +271,5 @@ export default function Login() {
         </div>
     );
 }
+
+export default memo(Login)

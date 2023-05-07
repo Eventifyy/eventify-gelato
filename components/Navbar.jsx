@@ -2,8 +2,11 @@
 import Link from "next/link";
 import LoginWrapper from "./LoginWrapper";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
 
-export default function Navbar() {
+export default function Navbar({isHomePage}) {
+
+    const smartAcc = useSelector((state) => state.login.smartAcc);
     const router = useRouter();
 
     const isActive = (pathname) => {
@@ -27,7 +30,10 @@ export default function Navbar() {
                     <Link className="hover:opacity-75 lg:pl-5 lg:pr-5" href="/dashboard">Dashboard</Link>
                 </li>
             </ul>
-            <LoginWrapper />
+            {
+                isHomePage ? <LoginWrapper /> : smartAcc ? <button>Logout</button> : <LoginWrapper />
+            }
+            
         </div>
     );
 }
