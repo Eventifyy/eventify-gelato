@@ -191,3 +191,7 @@ body {
     padding-right: 1.5rem;
   }
 }
+
+.dash-h{
+  height: calc(100vh - 90px);
+}

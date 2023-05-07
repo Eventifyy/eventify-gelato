@@ -67,7 +67,7 @@ export default function Home() {
             </svg>
           </i>
         </div>
-        <p1>Hello</p1>
+        <Footer />
       </div>
   );
 }
