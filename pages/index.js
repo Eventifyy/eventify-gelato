@@ -71,7 +71,7 @@ export default function Home() {
         </div>
 
         <div className="mt-8 pb-10">
-          <h2 className="text-5xl text-center leading-[60px]  mb-8 font-bold">Enjot NFT Tickets <br /> without any web3 wallets.</h2>
+          <h2 className="text-4xl text-center leading-[50px]  mb-8 font-bold">Enjoy NFT Tickets <br /> without any web3 wallets.</h2>
           <div className="container mx-auto">
             <section
               id="signup"
