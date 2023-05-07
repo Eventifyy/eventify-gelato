@@ -187,42 +187,11 @@ export default function Host() {
     <div>
       <p>test</p>
       <button onClick={initiateTx}>test</button>
-      <div className="flex flex-col w-[500px] mx-auto">
-        <div className="flex flex-row justify-center items-center rounded-xl mt-5">
-          <div className="shrink-0 rounded-xl overflow-hidden h-20 w-20">
-            <img
-              alt="NFT"
-              className="h-full w-full object-cover cursor-pointer"
-              src={imgBase64 || "./download.gif"}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-row justify-between items-center bg-gray-800 rounded-xl mt-5">
-          <label className="block">
-            <span className="sr-only">Choose profile photo</span>
-            <input
-              type="file"
-              accept="image/png, image/gif, image/jpeg, image/webp"
-              className="block w-full text-sm text-slate-500
-                      file:mr-4 file:py-2 file:px-4
-                      file:rounded-full file:border-0
-                      file:text-sm file:font-semibold
-                      file:bg-[#19212c] file:text-gray-400
-                      hover:file:bg-[#1d2631]
-                      cursor-pointer focus:ring-0 focus:outline-none"
-              onChange={changeImage}
-              required
-            />
-            {/* <button onClick={click}>Debug</button> */}
-          </label>
-        </div>
-
-        <div className="flex flex-row justify-between items-center mt-5">
+      <div className="flex flex-col w-full mx-auto relative eFTMrM !container rounded-3xl overflow-hidden">
+        <div class="styles__AuthBlurBackground-sc-17gk2ab-12 kaEhpi "></div>
+        <div className="mt-5">
           <input
-            className="block w-full text-sm bg-input rounded-sm
-                    text-white bg-transparent border-0
-                    focus:outline-none focus:ring-0 py-3 px-3 mpl-2"
+            className="inputs"
             type="text"
             name="title"
             placeholder="Name"
@@ -233,11 +202,9 @@ export default function Host() {
           />
         </div>
 
-        <div className="flex flex-row justify-between items-center bg-input rounded-sm p mt-5">
+        <div className=" mt-5 pt-2">
           <textarea
-            className="block w-full text-sm resize-none
-                    text-white bg-transparent border-0
-                    focus:outline-none focus:ring-0 h-19 ml-2 mt-2"
+            className="inputs !min-h-[80px] !pt-3"
             type="text"
             name="description"
             placeholder="Description"
@@ -251,75 +218,123 @@ export default function Host() {
           ></textarea>
         </div>
 
-        <div className="flex flex-row justify-between items-center bg-input rounded-sm mt-5">
-          <input
-            className="block w-full text-sm
-                    text-white bg-transparent border-0
-                    focus:outline-none focus:ring-0 py-1 ml-2"
-            type="text"
-            name="venue"
-            placeholder="Venue"
-            onChange={(e) =>
-              setFormInput({
-                ...formInput,
-                venue: e.target.value,
-              })
-            }
-            required
-          />
+        <div className="flex gap-5">
+          <div className="rounded-sm mt-5 flex-1">
+            <input
+              className="inputs"
+              type="text"
+              name="venue"
+              placeholder="Venue"
+              onChange={(e) =>
+                setFormInput({
+                  ...formInput,
+                  venue: e.target.value,
+                })
+              }
+              required
+            />
+          </div>
+
+          <div className="rounded-sm mt-5 flex-1">
+            <input
+              className="inputs"
+              type="date"
+              name="date"
+              placeholder="Date"
+              onChange={(e) =>
+                setFormInput({ ...formInput, date: e.target.value })
+              }
+              required
+            />
+          </div>
         </div>
 
-        <div className="flex flex-row justify-between items-center bg-input rounded-sm mt-5">
-          <input
-            className="block w-full text-sm
-                    text-slate-500 bg-transparent border-0
-                    focus:outline-none focus:ring-0 ml-2 py-1"
-            type="date"
-            name="date"
-            placeholder="Date"
-            onChange={(e) =>
-              setFormInput({ ...formInput, date: e.target.value })
-            }
-            required
-          />
+        <div className="flex gap-5">
+          <div className="rounded-xsm mt-5 flex-1">
+            <input
+              className="inputs"
+              type="number"
+              name="host"
+              placeholder="Supply"
+              onChange={(e) =>
+                setFormInput({
+                  ...formInput,
+                  supply: e.target.value,
+                })
+              }
+              required
+            />
+          </div>
+
+          <div className="rounded-ms mt-5 flex-1">
+            <input
+              className="inputs"
+              type="number"
+              step={0.01}
+              min={0.01}
+              name="price"
+              placeholder="Price (MATIC)"
+              onChange={(e) =>
+                setFormInput({
+                  ...formInput,
+                  price: e.target.value,
+                })
+              }
+              required
+            />
+          </div>
         </div>
 
-        <div className="flex flex-row justify-between items-center bg-input rounded-xsm mt-5">
-          <input
-            className="block w-full text-sm
-                    text-white bg-transparent border-0
-                    focus:outline-none focus:ring-0 py-1 ml-2"
-            type="number"
-            name="host"
-            placeholder="Supply"
-            onChange={(e) =>
-              setFormInput({
-                ...formInput,
-                supply: e.target.value,
-              })
-            }
-            required
-          />
-        </div>
-
-        <div className="flex flex-row justify-between items-center bg-input rounded-ms mt-5">
-          <input
-            className="block w-full text-sm
-                    text-white bg-transparent border-0
-                    focus:outline-none focus:ring-0 py-1 ml-2"
-            type="number"
-            step={0.01}
-            min={0.01}
-            name="price"
-            placeholder="Price (MATIC)"
-            onChange={(e) =>
-              setFormInput({
-                ...formInput,
-                price: e.target.value,
-              })
-            }
-            required
-          />
+        <div className="flex mt-6">
+          <div className="flex items-center justify-center w-full">
+            <label
+              htmlFor="dropzone-file"
+              className="flex flex-col items-center justify-center w-full capa h-64 border-2 border-[#fffef11a] border-dashed rounded-lg cursor-pointer bg-[#fffef10d] hover:bg-gray-800"
+            >
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <svg
+                  aria-hidden="true"
+                  className="w-10 h-10 mb-3 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  />
+                </svg>
+                <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                  <span className="font-semibold">Choose profile picture</span>
+                </p>
+                <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                  <span className="font-semibold">Click to upload</span> or drag
+                  and drop
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  SVG, PNG, JPG or GIF (MAX. 800x400px)
+                </p>
+              </div>
+              <input
+                onChange={changeImage}
+                id="dropzone-file"
+                type="file"
+                className="hidden"
+              />
+            </label>
+          </div>
+          <div className="ml-6 flex-shrink-0 overflow-hidden rounded-md">
+            <div className="shrink-0 rounded-xl overflow-hidden ">
+              <img
+                alt="NFT"
+                className="h-64 w-auto  cursor-pointer"
+                src={imgBase64 || "./download.gif"}
+              />
+            </div>
+          </div>
         </div>
 
         <button
