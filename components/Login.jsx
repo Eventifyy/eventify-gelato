@@ -5,14 +5,21 @@ import "@biconomy/web3-auth/dist/src/style.css";
 import { useEffect, useState, useCallback } from "react";
 import { ethers } from "ethers";
 import { address, abi } from "../config";
+import { useDispatch, useSelector } from "react-redux";
+import { setSmartAcc, setUserInfo, setSAddress } from "../store/index.js"
 
 export default function Login() {
+    const dispatch = useDispatch()
     const [sdk, setSdk] = useState();
     const [wProvider, setWProvider] = useState();
-    const [smartAcc, setSmartAcc] = useState(); //this to host, events
+    const smartAcc = useSelector(state => state.login.smartAcc);
+    const sAddress = useSelector(state => state.login.sAddress);
+    const userInfo = useSelector(state => state.login.userInfo);
+    // const [smartAcc, setSmartAcc] = useState(); //this to host, events
     const [eAddress, setEAddress] = useState();
-    const [sAddress, setSAddress] = useState(); //this to dashboard
-    const [userInfo, setUserInfo] = useState(null); //this to dashboard
+
+    // const [sAddress, setSAddress] = useState(); //this to dashboard
+    // const [userInfo, setUserInfo] = useState(null); //this to dashboard
 
     useEffect(() => {
         initiate();
@@ -60,10 +67,10 @@ export default function Login() {
         }
         await sdk.logout();
         setWProvider(null);
-        setSmartAcc(null);
+        dispatch(setSmartAcc(null));
         setEAddress(null);
-        setSAddress(null);
-        setUserInfo(null)
+        dispatch(setSAddress(null))
+        dispatch(setUserInfo(null))
         window.getSocialLoginSDK = null;
         sdk.hideWallet();
         sdk(null);
@@ -73,7 +80,7 @@ export default function Login() {
         if (sdk) {
             const userInfo = await sdk.getUserInfo();
             console.log("userInfo", userInfo);
-            setUserInfo(userInfo);
+            dispatch(setUserInfo(userInfo))
         }
     }, [sdk]);
 
@@ -111,13 +118,13 @@ export default function Login() {
 
         let smartAccount = new SmartAccount(xProvider, options);
         smartAccount = await smartAccount.init();
-        setSmartAcc(smartAccount);
+        dispatch(setSmartAcc(smartAccount));
 
         const { data } = await smartAccount.getSmartAccountsByOwner({
             chainId: 80001,
             owner: xAddress,
         });
-        setSAddress(data[0].smartAccountAddress);
+        dispatch(setSAddress(data[0].smartAccountAddress));
 
         console.log("done");
     }

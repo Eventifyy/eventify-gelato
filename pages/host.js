@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Web3Storage } from "web3.storage";
 import { address } from "../config";
 import { ethers } from "ethers";
+import { useSelector } from "react-redux";
 
 export default function Host() {
     const [formInput, setFormInput] = useState({
@@ -16,7 +17,8 @@ export default function Host() {
     });
     const [imgBase64, setImgBase64] = useState(null);
 
-    const [smartAcc, setSmartAcc] = useState();
+    // const [smartAcc, setSmartAcc] = useState();
+    const smartAcc = useSelector(state => state.login.smartAcc);
 
     //
 

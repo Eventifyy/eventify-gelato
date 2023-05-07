@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { address, abi } from "../config";
 import { ethers } from "ethers";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 export default function Dashboard() {
     const [items, setItems] = useState([]);
 
-    const [sAddress, setSAddress] = useState();
-    const [userInfo, setUserInfo] = useState();
+    const sAddress = useSelector(state => state.login.sAddress);
+    const userInfo = useSelector(state => state.login.userInfo);
 
     useEffect(() => {
         fetchDashboard();

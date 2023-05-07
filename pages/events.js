@@ -4,11 +4,14 @@ import { address, abi } from "../config";
 import { ethers } from "ethers";
 import axios from "axios";
 import Link from "next/link";
+import { useSelector } from "react-redux";
 
 export default function Events() {
     const [items, setItems] = useState([]);
 
-    const [smartAcc, setSmartAcc] = useState();
+    // const [smartAcc, setSmartAcc] = useState();
+    const smartAcc = useSelector(state => state.login.smartAcc);
+    console.log("smart acc", smartAcc)
 
     useEffect(() => {
         fetchEvents();
