@@ -122,8 +122,8 @@ export default function Dashboard() {
     return (
         <div>
            
-            <div className="flex dash-h border-t border-t-gray-500">
-            <div className=" flex-1"> 
+            <div className="flex border-t border-t-gray-500">
+            <div className=" flex-1 py-14 overflow-scroll"> 
                 <h2 className="text-white text-3xl text-center mb-7 mt-3">
                             Dashboard
                 </h2>
@@ -145,7 +145,7 @@ export default function Dashboard() {
                 ))}
             </div>
 
-            <div className="w-[400px] p-8 py-20 border-l border-l-gray-500 ">
+            <div className="w-[450px] p-8 py-20 ">
                 <img className="w-20 h-20 rounded-full" src={userInfo?.profileImage} alt="" />
                 <p className="mt-3 text-lg capitalize ml-1">{userInfo?.name}</p>
                 <p className="mt-1 text-lg ml-1">{userInfo?.email}</p>

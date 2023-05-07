@@ -213,7 +213,7 @@ export default function Events() {
         pauseOnHover
         theme="dark"
         />
-        <h2 className="text-center text-4xl my-6 mb-7">Featured Events</h2>
+        <h2 className="text-center text-4xl my-6 mb-7 mt-14">Featured Events</h2>
       {/* <p>events</p>
       <button onClick={debug1}>test 1</button> */}
       {items.map((item, i) => (

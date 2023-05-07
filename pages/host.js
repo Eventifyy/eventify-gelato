@@ -507,7 +507,7 @@ export default function Host() {
                      {/* <h2 className="text-white text-3xl text-center mb-7 mt-3">
                     User 
                 </h2> */}
-                 <div className="tabs !mx-auto !mb-4">
+                 <div className="tabs !mx-auto !mb-4 !mt-14">
                     <button onClick={() => setTabValue("upload")} className={tabValue === "upload" ? "active" : ""}>
                         Host
                     </button>

@@ -14,7 +14,7 @@ export default function Navbar({isHomePage}) {
     };
 
     return (
-        <div className="flex justify-around p-6">
+        <div className="flex justify-around p-6 pb-1 border-b border-b-gray-500">
             <img src="./logo.png" alt="" width="150px" />
             <ul className="flex gap-3">
                 <li className={isActive('/') ? "text-purple-500" : ''}>

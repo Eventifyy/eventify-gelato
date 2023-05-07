@@ -16,7 +16,7 @@ export default function Home() {
   const router = useRouter()
   return (
     <div>
-        <div className="hero-wrapper mx-auto rounded-3xl !h-auto pb-0 relative container">
+        <div className="hero-wrapper mx-auto rounded-3xl !h-auto pb-0 relative container mt-16">
           <div className="relative mt-4 flex flex-1 flex-col justify-end overflow-hidden rounded-[36px] p-8 px-12">
             <div className="hero-bg absolute inset-0 -z-10 rounded-[36px] bg-[#191919] md:block [&>div]:absolute [&>div]:inset-0 [&>div]:rounded-[36px]"></div>
             {/**/}
