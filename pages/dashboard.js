@@ -13,15 +13,15 @@ export default function Dashboard() {
     const sAddress = useSelector((state) => state.login.sAddress);
     const userInfo = useSelector((state) => state.login.userInfo);
 
-    // useEffect(() => {
-    //     if(sAddress) {
-    //         fetchDashboard();
-    //     }
-    // }, [sAddress]);
-
     useEffect(() => {
-        fetchDashboard()
-    }, [])
+        if(sAddress) {
+            fetchDashboard();
+        }
+    }, [sAddress]);
+
+    // useEffect(() => {
+    //     fetchDashboard()
+    // }, [])
 
     const INFURA_ID = process.env.NEXT_PUBLIC_INFURA;
     const ALCHEMY_ID = process.env.NEXT_PUBLIC_ALCHEMY;
@@ -31,10 +31,10 @@ export default function Dashboard() {
         // `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`
     );
 
-    // const data = await contract.inventory(sAddress);
     async function fetchDashboard() {
-        const contract = new ethers.Contract(address, abi, provider);
-        const data = await contract.activeEvents();
+      const contract = new ethers.Contract(address, abi, provider);
+      const data = await contract.inventory(sAddress);
+        // const data = await contract.activeEvents();
         const itemsFetched = await Promise.all(
           data.map(async (i) => {
             const tokenUri = await contract.uri(i.tokenId.toString());

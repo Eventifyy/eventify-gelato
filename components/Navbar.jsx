@@ -31,7 +31,7 @@ export default function Navbar({isHomePage}) {
                 </li>
             </ul>
             {
-                isHomePage ? <LoginWrapper /> : smartAcc ? <button>Logout</button> : <LoginWrapper />
+                isHomePage ? <LoginWrapper /> : smartAcc ? <div>Logout</div> : <LoginWrapper />
             }
             
         </div>

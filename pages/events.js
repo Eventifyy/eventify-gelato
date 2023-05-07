@@ -16,6 +16,7 @@ export default function Events() {
 
   // const [smartAcc, setSmartAcc] = useState();
   const smartAcc = useSelector((state) => state.login.smartAcc);
+  const userInfo = useSelector((state) => state.login.userInfo);
   const [loading, setLoading] = useState(null)
 
   useEffect(() => {
@@ -64,13 +65,14 @@ export default function Events() {
     console.log("started");
 
     const _ticketId = prop.tokenId;
+    const _email = userInfo?.email;
     console.log(_ticketId);
 
     const erc20Interface = new ethers.utils.Interface([
-      "function claimTicket(uint256 _ticketId)",
+      "function claimTicket(uint256 _ticketId, string memory _email)",
     ]);
 
-    const data = erc20Interface.encodeFunctionData("claimTicket", [_ticketId]);
+    const data = erc20Interface.encodeFunctionData("claimTicket", [_ticketId, _email]);
 
     const tx1 = {
       to: address,
