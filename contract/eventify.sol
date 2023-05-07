@@ -30,44 +30,58 @@ contract Eventify is ERC1155URIStorage, ERC1155Holder {
         address host;
         uint supply;
         uint remaining;
-        uint price;
         address owner;
         uint256 tokenId;
     }
 
+    mapping (uint256 => string[]) public idToShortlist;
+
     mapping(uint256 => Ticket) public idToTicket;
 
-    function host(uint _price, uint _supply, string memory _tokenURI) public payable {
+    function host(uint _supply, string memory _tokenURI) public {
         _tokenId.increment();
         uint256 currentToken = _tokenId.current();
         _mint(msg.sender, currentToken, _supply, "");
         _setURI(currentToken, _tokenURI);
-        idToTicket[currentToken] = Ticket(msg.sender, _supply, _supply, _price, msg.sender, currentToken);
         _safeTransferFrom(msg.sender, address(this), currentToken, _supply, "");
+        idToTicket[currentToken] = Ticket(msg.sender, _supply, _supply, address(this), currentToken);
     }
 
-    function claimTicket(uint256 _ticketId) public payable {
+    function claimTicket(uint256 _ticketId, string memory _email) public returns (bool) {
         Ticket memory ticket = idToTicket[_ticketId];
-        require(balanceOf((msg.sender), _ticketId) < 1, "");
-        require(ticket.remaining > 0);
-        _safeTransferFrom(address(this), msg.sender, _ticketId, 1, "");
-        ticket.owner = payable(msg.sender);
-        ticket.remaining--;
+
+        for (uint256 i = 0; i < ticket.supply; i++) {
+            string memory currentEmail = idToShortlist[_ticketId][i];
+            // string memory currentEmail = "test";
+            if ( keccak256(abi.encodePacked(currentEmail)) == keccak256(abi.encodePacked(_email)) ) {
+                require(ticket.remaining > 0, "No tickets left to claim");
+                require(balanceOf(msg.sender, _ticketId) < 1, "You already own a ticket");
+                _safeTransferFrom(address(this), msg.sender, _ticketId, 1, "");
+                ticket.owner = payable(msg.sender);
+                ticket.remaining = ticket.remaining - 1;
+                return true;
+            }
+        }
+        return false;
     }
 
-    function inventory() public view returns (Ticket[] memory) {
+    function updatShortlist(uint256 _ticketId, string[] memory _shortlist) public {
+        idToShortlist[_ticketId] = _shortlist;
+    }
+
+    function inventory(address _user) public view returns (Ticket[] memory) {
         uint256 counter = 0;
         uint256 length;
 
         for (uint256 i = 0; i < _tokenId.current(); i++) {
-            if (idToTicket[i + 1].owner == msg.sender) {
+            if (idToTicket[i + 1].owner == _user) {
                 length++;
             }
         }
 
         Ticket[] memory myTickets = new Ticket[](length);
         for (uint256 i = 0; i < _tokenId.current(); i++) {
-            if (idToTicket[i + 1].owner == msg.sender) {
+            if (idToTicket[i + 1].owner == _user) {
                 uint256 currentId = i + 1;
                 Ticket storage currentItem = idToTicket[currentId];
                 myTickets[counter] = currentItem;
