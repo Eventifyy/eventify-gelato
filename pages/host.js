@@ -185,8 +185,9 @@ export default function Host() {
 
   return (
     <div>
-      <p>test</p>
-      <button onClick={initiateTx}>test</button>
+      {/* <p>test</p>
+      <button onClick={initiateTx}>test</button> */}
+      <h2 className="text-white text-3xl text-center mb-7 mt-3">Host a Event</h2>
       <div className="flex flex-col w-full mx-auto relative eFTMrM !container rounded-3xl overflow-hidden">
         <div class="styles__AuthBlurBackground-sc-17gk2ab-12 kaEhpi "></div>
         <div className="mt-5">
@@ -235,18 +236,6 @@ export default function Host() {
             />
           </div>
 
-          <div className="rounded-sm mt-5 flex-1">
-            <input
-              className="inputs"
-              type="date"
-              name="date"
-              placeholder="Date"
-              onChange={(e) =>
-                setFormInput({ ...formInput, date: e.target.value })
-              }
-              required
-            />
-          </div>
         </div>
 
         <div className="flex gap-5">
@@ -266,19 +255,14 @@ export default function Host() {
             />
           </div>
 
-          <div className="rounded-ms mt-5 flex-1">
+          <div className="rounded-sm mt-5 flex-1">
             <input
               className="inputs"
-              type="number"
-              step={0.01}
-              min={0.01}
-              name="price"
-              placeholder="Price (MATIC)"
+              type="date"
+              name="date"
+              placeholder="Date"
               onChange={(e) =>
-                setFormInput({
-                  ...formInput,
-                  price: e.target.value,
-                })
+                setFormInput({ ...formInput, date: e.target.value })
               }
               required
             />
