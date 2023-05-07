@@ -21,7 +21,7 @@ export default function Host() {
     const [imgBase64, setImgBase64] = useState(null);
     const [buttonLoading, setButtonLoading] = useState(false);
     const [imageLoading, setImageLoading] = useState(false);
-    const [tabValue, setTabValue] = useState("host");
+    const [tabValue, setTabValue] = useState("upload");
 
     // const [smartAcc, setSmartAcc] = useState();
     const smartAcc = useSelector((state) => state.login.smartAcc);
@@ -228,10 +228,6 @@ export default function Host() {
     function renderHost() {
         return (
             <div>
-                <h2 className="text-white text-3xl text-center mb-7 mt-3">
-                    Host a Event
-                </h2>
-
                 <div className="flex flex-col w-full mx-auto relative eFTMrM !container rounded-3xl overflow-hidden">
                     <div class="styles__AuthBlurBackground-sc-17gk2ab-12 kaEhpi "></div>
                     <div className="mt-5">
@@ -413,9 +409,6 @@ export default function Host() {
     function renderShortlist() {
         return (
             <div>
-                <h2 className="text-white text-3xl text-center mb-7 mt-3">
-                    Upload Shortlist
-                </h2>
                 <div className="flex gap-5 flex-col w-full mx-auto relative eFTMrM !container rounded-3xl overflow-hidden">
                     <div class="styles__AuthBlurBackground-sc-17gk2ab-12 kaEhpi "></div>
                 <div>
@@ -478,8 +471,19 @@ export default function Host() {
             />
             {/* <p>test</p>
       <button onClick={initiateTx}>test</button> */}
+                     {/* <h2 className="text-white text-3xl text-center mb-7 mt-3">
+                    User 
+                </h2> */}
+                 <div className="tabs !mx-auto !mb-4">
+                    <button onClick={() => setTabValue("upload")} className={tabValue === "upload" ? "active" : ""}>
+                        Upload
+                    </button>
+                    <button onClick={() => setTabValue("shortlist")} className={tabValue === "shortlist" ? "active" : ""}>
+                        Shortlist
+                    </button>
+                </div>
 
-            {tabValue === "hos" ? renderHost() : renderShortlist()}
+            {tabValue === "upload" ? renderHost() : renderShortlist()}
         </div>
     );
 }
