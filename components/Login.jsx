@@ -18,6 +18,12 @@ export default function Login() {
         initiate();
     }, []);
 
+    useEffect(() => {
+        if(sdk?.provider) {
+
+        }
+    }, [])
+
 
     async function initiate() {
         const socialLoginSDK = new SocialLogin();
@@ -43,7 +49,7 @@ export default function Login() {
         setEAddress(accounts);
         sdk.hideWallet();
         getUserInfo()
-
+        getSmartAccount(provider, accounts)
         console.log("done");
     }
 
@@ -71,7 +77,7 @@ export default function Login() {
         }
     }, [sdk]);
 
-    async function getSmartAccount() {
+    async function getSmartAccount(xProvider, xAddress) {
         console.log("started");
 
         const INFURA_ID = process.env.NEXT_PUBLIC_INFURA
@@ -103,13 +109,13 @@ export default function Login() {
             ],
         };
 
-        let smartAccount = new SmartAccount(wProvider, options);
+        let smartAccount = new SmartAccount(xProvider, options);
         smartAccount = await smartAccount.init();
         setSmartAcc(smartAccount);
 
         const { data } = await smartAccount.getSmartAccountsByOwner({
             chainId: 80001,
-            owner: eAddress,
+            owner: xAddress,
         });
         setSAddress(data[0].smartAccountAddress);
 
@@ -238,14 +244,14 @@ export default function Login() {
     return (
         <div>
             {eAddress ? <button onClick={disconnect}>Logout</button> : <button onClick={connect}>Login</button>}
-            <div className="flex gap-3">
+            {/* <div className="flex gap-3">
                 <button onClick={debug1}>connect()</button>
                 <button onClick={debug2}>getSmartAccount()</button>
                 <button onClick={debug3}>transfer()</button>
                 <button onClick={debug4}>mint()</button>
             </div>
             <p>e: {eAddress}</p>
-            <p>s: {sAddress}</p>
+            <p>s: {sAddress}</p> */}
         </div>
     );
 }
