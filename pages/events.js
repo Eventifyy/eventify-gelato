@@ -10,8 +10,7 @@ export default function Events() {
     const [items, setItems] = useState([]);
 
     // const [smartAcc, setSmartAcc] = useState();
-    const smartAcc = useSelector(state => state.login.smartAcc);
-    console.log("smart acc", smartAcc)
+    const smartAcc = useSelector((state) => state.login.smartAcc);
 
     useEffect(() => {
         fetchEvents();
@@ -32,15 +31,15 @@ export default function Events() {
             data.map(async (i) => {
                 const tokenUri = await contract.uri(i.tokenId.toString());
                 console.log(tokenUri);
-                // const meta = await axios.get(tokenUri + "/");
-                let price = ethers.utils.formatEther(i.price);
+                const meta = await axios.get(tokenUri + "/");
+                // let price = ethers.utils.formatEther(i.price);
                 let item = {
-                    price,
-                    // name: meta.data.name,
-                    // cover: meta.data.cover,
-                    // description: meta.data.description,
-                    // date: meta.data.date,
-                    // venue: meta.data.venue,
+                    // price,
+                    name: meta.data.name,
+                    cover: meta.data.cover,
+                    description: meta.data.description,
+                    date: meta.data.date,
+                    venue: meta.data.venue,
                     supply: i.supply.toNumber(),
                     tokenId: i.tokenId.toNumber(),
                     remaining: i.remaining.toNumber(),
@@ -59,6 +58,7 @@ export default function Events() {
         console.log("started");
 
         const _ticketId = prop.tokenId;
+        console.log(_ticketId);
 
         const erc20Interface = new ethers.utils.Interface([
             "function claimTicket(uint256 _ticketId)",
@@ -89,6 +89,7 @@ export default function Events() {
         // Sending gasless transaction
         const txResponse = await smartAcc.sendTransaction({
             transaction: tx1,
+            // gasLimit: 1000000,
         });
         console.log("userOp hash", txResponse.hash);
 
@@ -158,13 +159,13 @@ export default function Events() {
                 <Card
                     key={i}
                     price={item.price}
-                    // name={item.name}
-                    // cover={item.cover}
-                    // description={item.description}
-                    // date={item.date}
-                    // venue={item.venue}
+                    name={item.name}
+                    cover={item.cover}
+                    description={item.description}
+                    date={item.date}
+                    venue={item.venue}
                     supply={item.supply}
-                    tokenId={item.supply}
+                    tokenId={item.tokenId}
                     remaining={item.remaining}
                     host={item.host}
                 />

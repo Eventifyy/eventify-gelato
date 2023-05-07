@@ -1,7 +1,6 @@
-export const address = `0xd9c7dd2ee369c05589c3948556f990175C6b439e`
+export const address = `0xA29cD8626B13349B24Dab6Af37DF8228b718b0B9`
 
-export const abi = `
-[
+export const abi = `[
 	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
@@ -42,16 +41,11 @@ export const abi = `
 		],
 		"name": "claimTicket",
 		"outputs": [],
-		"stateMutability": "payable",
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
 		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_price",
-				"type": "uint256"
-			},
 			{
 				"internalType": "uint256",
 				"name": "_supply",
@@ -345,11 +339,6 @@ export const abi = `
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint256",
-						"name": "price",
-						"type": "uint256"
-					},
-					{
 						"internalType": "address",
 						"name": "owner",
 						"type": "address"
@@ -442,11 +431,6 @@ export const abi = `
 				"type": "uint256"
 			},
 			{
-				"internalType": "uint256",
-				"name": "price",
-				"type": "uint256"
-			},
-			{
 				"internalType": "address",
 				"name": "owner",
 				"type": "address"
@@ -461,7 +445,13 @@ export const abi = `
 		"type": "function"
 	},
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_user",
+				"type": "address"
+			}
+		],
 		"name": "inventory",
 		"outputs": [
 			{
@@ -479,11 +469,6 @@ export const abi = `
 					{
 						"internalType": "uint256",
 						"name": "remaining",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "price",
 						"type": "uint256"
 					},
 					{

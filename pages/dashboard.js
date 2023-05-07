@@ -8,12 +8,14 @@ import { useSelector } from "react-redux";
 export default function Dashboard() {
     const [items, setItems] = useState([]);
 
-    const sAddress = useSelector(state => state.login.sAddress);
-    const userInfo = useSelector(state => state.login.userInfo);
+    const sAddress = useSelector((state) => state.login.sAddress);
+    const userInfo = useSelector((state) => state.login.userInfo);
 
     useEffect(() => {
-        fetchDashboard();
-    });
+        if(sAddress) {
+            fetchDashboard();
+        }
+    }, [sAddress]);
 
     const INFURA_ID = process.env.NEXT_PUBLIC_INFURA;
     const ALCHEMY_ID = process.env.NEXT_PUBLIC_ALCHEMY;
@@ -25,20 +27,20 @@ export default function Dashboard() {
 
     async function fetchDashboard() {
         const contract = new ethers.Contract(address, abi, provider);
-        const data = await contract.inventory();
+        const data = await contract.inventory(sAddress);
         const itemsFetched = await Promise.all(
             data.map(async (i) => {
                 const tokenUri = await contract.uri(i.tokenId.toString());
                 console.log(tokenUri);
-                // const meta = await axios.get(tokenUri + "/");
-                let price = ethers.utils.formatEther(i.price);
+                const meta = await axios.get(tokenUri + "/");
+                // let price = ethers.utils.formatEther(i.price);
                 let item = {
-                    price,
-                    // name: meta.data.name,
-                    // cover: meta.data.cover,
-                    // description: meta.data.description,
-                    // date: meta.data.date,
-                    // venue: meta.data.venue,
+                    // price,
+                    name: meta.data.name,
+                    cover: meta.data.cover,
+                    description: meta.data.description,
+                    date: meta.data.date,
+                    venue: meta.data.venue,
                     supply: i.supply.toNumber(),
                     tokenId: i.tokenId.toNumber(),
                     remaining: i.remaining.toNumber(),
@@ -85,8 +87,6 @@ export default function Dashboard() {
                         <p className="mt-[10px] font-normal lg:text-[20px] text-[14px] text-[#C6C6C6]">
                             {prop.description}
                         </p>
-
-                        <button>Claim</button>
                     </div>
                 </div>
             </div>
@@ -96,9 +96,10 @@ export default function Dashboard() {
     return (
         <div>
             <p>test</p>
-            {/* <img src={userInfo.profileImage} alt="" />
-            <p>{userInfo.name}</p>
-            <p>{userInfo.email}</p> */}
+            <button onClick={fetchDashboard}>test fetching</button>
+            <img src={userInfo?.profileImage} alt="" />
+            <p>{userInfo?.name}</p>
+            <p>{userInfo?.email}</p>
             <p>smart contract account : {sAddress}</p>
 
             <div>
@@ -106,11 +107,11 @@ export default function Dashboard() {
                     <Card
                         key={i}
                         price={item.price}
-                        // name={item.name}
-                        // cover={item.cover}
-                        // description={item.description}
-                        // date={item.date}
-                        // venue={item.venue}
+                        name={item.name}
+                        cover={item.cover}
+                        description={item.description}
+                        date={item.date}
+                        venue={item.venue}
                         supply={item.supply}
                         tokenId={item.supply}
                         remaining={item.remaining}

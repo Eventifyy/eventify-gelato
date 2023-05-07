@@ -27,9 +27,10 @@ export default function Login() {
 
     useEffect(() => {
         if(sdk?.provider) {
-
+            connect()
+            // connect2(sdk.provider)
         }
-    }, [])
+    }, [sdk])
 
 
     async function initiate() {
@@ -51,12 +52,18 @@ export default function Login() {
         if (!sdk?.provider) return;
         const provider = new ethers.providers.Web3Provider(sdk.provider);
         // const walletProvider = new ethers.providers.Web3Provider(provider);
-        const accounts = await provider.listAccounts();
-        setWProvider(provider);
+        connect2(provider)
+
+    }
+
+    async function connect2(xProvider) {
+        const accounts = await xProvider.listAccounts();
+        setWProvider(xProvider);
         setEAddress(accounts);
         sdk.hideWallet();
+        if (smartAcc) return
         getUserInfo()
-        getSmartAccount(provider, accounts)
+        getSmartAccount(xProvider, accounts)
         console.log("done");
     }
 
@@ -125,6 +132,7 @@ export default function Login() {
             owner: xAddress,
         });
         dispatch(setSAddress(data[0].smartAccountAddress));
+        console.log(setSAddress(data[0].smartAccountAddress))
 
         console.log("done");
     }
@@ -250,7 +258,7 @@ export default function Login() {
 
     return (
         <div>
-            {eAddress ? <button onClick={disconnect}>Logout</button> : <button onClick={connect}>Login</button>}
+            {sdk?.provider ? <button onClick={disconnect}>Logout</button> : <button onClick={connect}>Login</button>}
             {/* <div className="flex gap-3">
                 <button onClick={debug1}>connect()</button>
                 <button onClick={debug2}>getSmartAccount()</button>
