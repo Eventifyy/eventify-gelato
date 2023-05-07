@@ -18,10 +18,39 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
+  background: #17181d;
+  /* background: linear-gradient(
       to bottom,
       transparent,
       rgb(var(--background-end-rgb))
     )
-    rgb(var(--background-start-rgb));
+    rgb(var(--background-start-rgb)); */
+}
+
+.eFTMrM::after {
+    content: "";
+    position: absolute;
+    z-index: -10;
+    bottom: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    opacity: 1;
+    background: inherit;
+    border-radius: 4px;
+}
+.kaEhpi {
+  z-index: -20;
+  position: absolute;
+  inset: -20px;
+  margin: auto;
+  background: linear-gradient(140.9deg, rgba(211, 194, 165, 0.5) 1.28%, rgba(213, 160, 124, 0.5) 20.05%, rgba(166, 93, 94, 0.5) 54.11%, rgba(84, 66, 67, 0.5) 100.02%);
+  filter: blur(100px);
+  animation: 6s linear 0s infinite normal none running ciuxCJ;
+}
+
+.bg-input{
+  order: 1px solid rgba(255, 254, 241, 0.2);
+    transition: border-color 0.2s ease 0s, background-color 0.3s ease 0s, opacity 0.2s ease 0s;
+  background: radial-gradient(202.04% 202.04% at 50% 111.22%, rgba(255, 254, 241, 0.1) 0%, rgba(120, 120, 120, 0.1) 23.95%);
 }
