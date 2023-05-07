@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Web3Storage } from "web3.storage";
-import { address } from "../config";
 import { ethers } from "ethers";
 import { useSelector } from "react-redux";
+import { address, abi } from "../config";
 
 export default function Test() {
     const [formInput, setFormInput] = useState({
@@ -42,21 +42,21 @@ export default function Test() {
     };
     //
 
+    function handleArray(e) {
+        formInput.shortlistArray.push(e.target.value);
+    }
+
+
     async function updateShortlist() {
         console.log("started");
 
-        const _ticketId = parseInt(formInput.ticketId);
-        const _shortlistArray = JSON.parse(JSON.stringify(formInput.shortlistArray));
-        console.log(formInput)
-        console.log(_ticketId, _shortlistArray)
-
         const erc20Interface = new ethers.utils.Interface([
-            "function claimTicket(uint256 _ticketId, string memory _email)",
+            "function updatShortlist(uint256 _ticketId, string[] memory _shortlist)",
         ]);
 
-        const data = erc20Interface.encodeFunctionData("claimTicket", [
-            _ticketId,
-            _shortlistArray,
+        const data = erc20Interface.encodeFunctionData("updatShortlist", [
+            formInput.ticketId,
+            formInput.shortlistArray,
         ]);
 
         const tx1 = {
@@ -88,10 +88,13 @@ export default function Test() {
 
         console.log("done");
     }
+    
 
     function debug() {
-        const _shortlistArray = JSON.parse(JSON.stringify(formInput.shortlistArray));
-        console.log(_shortlistArray)
+        const _shortlistArray = JSON.parse(
+            JSON.stringify(formInput.shortlistArray)
+        );
+        console.log(formInput);
     }
 
     return (
@@ -113,16 +116,23 @@ export default function Test() {
                 type="text"
                 name="shortlistArray"
                 placeholder="Shortlist"
-                onChange={(e) =>{
-                    console.log("event is", e.target.value)
-                    let ar = []
-                    
+                // onChange={handleArray}
+                // onChange={(e) =>{
+                //     console.log("event is", e.target.value)
+                //     let ar = []
+
+                //     setFormInput({
+                //         ...formInput,
+                //         shortlistArray: e.target.value?.split(","),
+                //     })
+                // }
+                // }
+                onChange={(e) => {
                     setFormInput({
                         ...formInput,
                         shortlistArray: e.target.value?.split(","),
-                    })
-                }
-                }
+                    });
+                }}
                 required
             />
             <button onClick={updateShortlist}>Upload</button>
