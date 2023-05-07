@@ -25,10 +25,12 @@ export default function Dashboard() {
 
     const INFURA_ID = process.env.NEXT_PUBLIC_INFURA;
     const ALCHEMY_ID = process.env.NEXT_PUBLIC_ALCHEMY;
-
+    const QUICKNODE_ID =process.env.NEXT_PUBLIC_QUICKNODE;
+  
     const provider = new ethers.providers.JsonRpcProvider(
-        `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`
-        // `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`
+      `https://crimson-warmhearted-tab.matic-testnet.discover.quiknode.pro/${QUICKNODE_ID}`
+      // `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`
+      // `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`
     );
 
     async function fetchDashboard() {

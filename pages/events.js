@@ -25,9 +25,11 @@ export default function Events() {
 
   const INFURA_ID = process.env.NEXT_PUBLIC_INFURA;
   const ALCHEMY_ID = process.env.NEXT_PUBLIC_ALCHEMY;
+  const QUICKNODE_ID =process.env.NEXT_PUBLIC_QUICKNODE;
 
   const provider = new ethers.providers.JsonRpcProvider(
-    `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`
+    `https://crimson-warmhearted-tab.matic-testnet.discover.quiknode.pro/${QUICKNODE_ID}`
+    // `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`
     // `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`
   );
 
@@ -65,7 +67,8 @@ export default function Events() {
     console.log("started");
 
     const _ticketId = prop.tokenId;
-    const _email = userInfo?.email;
+    const _email = userInfo.email;
+    console.log(_email)
     console.log(_ticketId);
 
     const erc20Interface = new ethers.utils.Interface([
@@ -102,6 +105,7 @@ export default function Events() {
     const txReceipt = await txResponse.wait();
     console.log("Tx hash", txReceipt.transactionHash);
 
+    console.log(txResponse)
     console.log("done");
     toast.success('Claimed successfully', {
         position: "top-right",

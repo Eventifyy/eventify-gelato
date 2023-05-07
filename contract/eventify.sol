@@ -48,24 +48,24 @@ contract Eventify is ERC1155URIStorage, ERC1155Holder {
     }
 
     function claimTicket(uint256 _ticketId, string memory _email) public returns (bool) {
-        Ticket memory ticket = idToTicket[_ticketId];
+        Ticket storage ticket = idToTicket[_ticketId];
 
         for (uint256 i = 0; i < ticket.supply; i++) {
             string memory currentEmail = idToShortlist[_ticketId][i];
-            // string memory currentEmail = "test";
             if ( keccak256(abi.encodePacked(currentEmail)) == keccak256(abi.encodePacked(_email)) ) {
                 require(ticket.remaining > 0, "No tickets left to claim");
                 require(balanceOf(msg.sender, _ticketId) < 1, "You already own a ticket");
                 _safeTransferFrom(address(this), msg.sender, _ticketId, 1, "");
-                ticket.owner = payable(msg.sender);
+                ticket.owner = msg.sender;
                 ticket.remaining = ticket.remaining - 1;
                 return true;
             }
         }
+
         return false;
     }
 
-    function updatShortlist(uint256 _ticketId, string[] memory _shortlist) public {
+    function updatShortlist(uint256 _ticketId, string[] memory _shortlist) public {    
         idToShortlist[_ticketId] = _shortlist;
     }
 
