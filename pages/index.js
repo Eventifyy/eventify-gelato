@@ -1,6 +1,7 @@
 import Footer from "@/components/Footer";
 import Lottie from "react-lottie";
 import animationData from "../assets/lottie/animation-1.json";
+import { useRouter } from "next/router";
 
 const defaultOptions = {
   loop: true,
@@ -12,6 +13,7 @@ const defaultOptions = {
 };
 
 export default function Home() {
+  const router = useRouter()
   return (
     <div>
         <div className="hero-wrapper mx-auto rounded-3xl !h-auto pb-0 relative container">
