@@ -1,8 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useState } from "react";
-import { address, abi } from "../config";
+import { useState } from "react";
+import { address } from "../config";
 import { ethers } from "ethers";
-import axios from "axios";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import LocationSvg from "../assets/images/location.png";
@@ -12,55 +11,12 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function Events() {
-  const [items, setItems] = useState([]);
 
-  // const [smartAcc, setSmartAcc] = useState();
-  const smartAcc = useSelector((state) => state.login.smartAcc);
-  const userInfo = useSelector((state) => state.login.userInfo);
+  const { smartAcc, userInfo, eventItems } = useSelector(
+    (state) => state.login
+);
   const [loading, setLoading] = useState(null)
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const INFURA_ID = process.env.NEXT_PUBLIC_INFURA;
-  const ALCHEMY_ID = process.env.NEXT_PUBLIC_ALCHEMY;
-  const QUICKNODE_ID =process.env.NEXT_PUBLIC_QUICKNODE;
-
-  const provider = new ethers.providers.JsonRpcProvider(
-    `https://crimson-warmhearted-tab.matic-testnet.discover.quiknode.pro/${QUICKNODE_ID}`
-    // `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`
-    // `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`
-  );
-
-  async function fetchEvents() {
-    const contract = new ethers.Contract(address, abi, provider);
-    const data = await contract.activeEvents();
-    const itemsFetched = await Promise.all(
-      data.map(async (i) => {
-        const tokenUri = await contract.uri(i.tokenId.toString());
-        console.log(tokenUri);
-        const meta = await axios.get(tokenUri + "/");
-        // let price = ethers.utils.formatEther(i.price);
-        let item = {
-          // price,
-          name: meta.data.name,
-          cover: meta.data.cover,
-          description: meta.data.description,
-          date: meta.data.date,
-          venue: meta.data.venue,
-          supply: i.supply.toNumber(),
-          tokenId: i.tokenId.toNumber(),
-          remaining: i.remaining.toNumber(),
-          host: i.host,
-        };
-        return item;
-      })
-    );
-
-    setItems(itemsFetched);
-    console.log(itemsFetched);
-  }
 
   async function claim(prop) {
     setLoading(prop.tokenId)
@@ -194,11 +150,6 @@ export default function Events() {
     );
   }
 
-  function debug1() {
-    fetchEvents();
-    console.log(items);
-  }
-
   return (
     <div className="b">
         <ToastContainer
@@ -216,7 +167,7 @@ export default function Events() {
         <h2 className="text-center text-4xl my-6 mb-7 mt-14">Featured Events</h2>
       {/* <p>events</p>
       <button onClick={debug1}>test 1</button> */}
-      {items.map((item, i) => (
+      {eventItems.map((item, i) => (
         <Card
           key={i}
           loading={loading}

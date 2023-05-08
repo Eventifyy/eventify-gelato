@@ -28,8 +28,10 @@ export default function Host() {
 
     //
 
+    const web3StorageKey = process.env.NEXT_PUBLIC_WEB3STORAGE
+
     function getAccessToken() {
-        return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDkyMjkyQjQ5YzFjN2ExMzhERWQxQzQ3NGNlNmEyNmM1NURFNWQ0REQiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NjUyMzg2MDc1NDEsIm5hbWUiOiJNZXRhRmkifQ.cwyjEIx8vXtTnn8Y3vctroo_rooHV4ww_2xKY-MT0rs";
+        return web3StorageKey
     }
 
     function makeStorageClient() {

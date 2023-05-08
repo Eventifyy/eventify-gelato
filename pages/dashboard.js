@@ -1,67 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useState } from "react";
-import { address, abi } from "../config";
-import { ethers } from "ethers";
-import axios from "axios";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import Image from "next/image";
 import LocationSvg from "../assets/images/location.png"
 
 export default function Dashboard() {
-    const [items, setItems] = useState([]);
-
-    const sAddress = useSelector((state) => state.login.sAddress);
-    const userInfo = useSelector((state) => state.login.userInfo);
-
-    useEffect(() => {
-        if(sAddress) {
-            fetchDashboard();
-        }
-    }, [sAddress]);
-
-    // useEffect(() => {
-    //     fetchDashboard()
-    // }, [])
-
-    const INFURA_ID = process.env.NEXT_PUBLIC_INFURA;
-    const ALCHEMY_ID = process.env.NEXT_PUBLIC_ALCHEMY;
-    const QUICKNODE_ID =process.env.NEXT_PUBLIC_QUICKNODE;
   
-    const provider = new ethers.providers.JsonRpcProvider(
-      `https://crimson-warmhearted-tab.matic-testnet.discover.quiknode.pro/${QUICKNODE_ID}`
-      // `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`
-      // `https://polygon-mumbai.infura.io/v3/${INFURA_ID}`
-    );
-
-    async function fetchDashboard() {
-      const contract = new ethers.Contract(address, abi, provider);
-      const data = await contract.inventory(sAddress);
-        // const data = await contract.activeEvents();
-        const itemsFetched = await Promise.all(
-          data.map(async (i) => {
-            const tokenUri = await contract.uri(i.tokenId.toString());
-            console.log(tokenUri);
-            const meta = await axios.get(tokenUri + "/");
-            // let price = ethers.utils.formatEther(i.price);
-            let item = {
-              // price,
-              name: meta.data.name,
-              cover: meta.data.cover,
-              description: meta.data.description,
-              date: meta.data.date,
-              venue: meta.data.venue,
-              supply: i.supply.toNumber(),
-              tokenId: i.tokenId.toNumber(),
-              remaining: i.remaining.toNumber(),
-              host: i.host,
-            };
-            return item;
-          })
-        );
-    
-        setItems(itemsFetched);
-        console.log("t", itemsFetched);
-    }
+    const { sAddress, userInfo, dashboardItems } = useSelector(
+      (state) => state.login
+  );
 
     function Card(prop) {
         const date = new Date(prop.date);
@@ -127,7 +74,7 @@ export default function Dashboard() {
                 <h2 className="text-white text-3xl text-center mb-7 mt-3">
                             Dashboard
                 </h2>
-                {items.map((item, i) => (
+                {dashboardItems.map((item, i) => (
                     <Card
                         key={i}
                         // loading={loading}

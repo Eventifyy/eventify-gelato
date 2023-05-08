@@ -7,6 +7,8 @@ export const loginSlice = createSlice({
     smartAcc: "",
     sAddress: "",
     userInfo: "",
+    eventItems: [],
+    dashboardItems: []
   },
   reducers: {
     setSmartAcc: (state, action) => {
@@ -17,6 +19,12 @@ export const loginSlice = createSlice({
     },
     setUserInfo: (state, action) => {
         state.userInfo = action.payload
+    },
+    setEventItems: (state, action) => {
+      state.eventItems = action.payload
+    },
+    setDashboardItems: (state, action) => {
+      state.dashboardItems = action.payload
     }
   },
 });
@@ -30,4 +38,4 @@ const store = configureStore({
 export default store;
 
 // export the action
-export const { setSmartAcc, setSAddress, setUserInfo } = loginSlice.actions;
+export const { setSmartAcc, setSAddress, setUserInfo, setEventItems, setDashboardItems } = loginSlice.actions;

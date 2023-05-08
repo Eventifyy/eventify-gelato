@@ -5,6 +5,7 @@ import "@/styles/globals.css";
 
 export default function App({ Component, pageProps, ...appProps }) {
   const isHomePage = (appProps.router.pathname === "/")
+
   return (
     <Provider store={store}>
       <div>
