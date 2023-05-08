@@ -28,7 +28,8 @@ export default function Middleware() {
 
     const ALCHEMY_ID = process.env.NEXT_PUBLIC_ALCHEMY;
     // const BiconomyAPI = process.env.NEXT_PUBLIC_BiconomyAPI;
-    // const whitelistDomainName = process.env.NEXT_PUBLIC_DomainName;
+    // const WhitelistDOMAIN1 = process.env.NEXT_PUBLIC_WhitelistDOMAIN1;
+    // const WhitelistDOMAIN2 = process.env.NEXT_PUBLIC_WhitelistDOMAIN2;
 
     const provider = new ethers.providers.JsonRpcProvider(
         `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`

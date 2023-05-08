@@ -16,7 +16,8 @@ function Login() {
     );
     const [eAddress, setEAddress] = useState();
 
-    const whitelistDomainName = process.env.NEXT_PUBLIC_DomainName;
+    const WhitelistDOMAIN1 = process.env.NEXT_PUBLIC_WhitelistDOMAIN1;
+    const WhitelistDOMAIN2 = process.env.NEXT_PUBLIC_WhitelistDOMAIN2;
     const ALCHEMY_ID = process.env.NEXT_PUBLIC_ALCHEMY;
     const BiconomyAPI = process.env.NEXT_PUBLIC_BiconomyAPI;
 
@@ -100,25 +101,32 @@ function Login() {
         }
     }, [sdk]);
 
-    const initiate = async () =>{
+    const initiate = async () => {
         const socialLoginSDK = new SocialLogin();
 
         const signature = await socialLoginSDK.whitelistUrl(
             "http://localhost:3000/"
         );
         const signature2 = await socialLoginSDK.whitelistUrl(
-            `${whitelistDomainName}`
+            `${WhitelistDOMAIN1}`
+        );
+        const signature3 = await socialLoginSDK.whitelistUrl(
+            `${WhitelistDOMAIN2}`
         );
         await socialLoginSDK.init({
             whitelistUrls: {
                 "http://localhost:3000/": signature,
-                whitelistDomainName: signature2,
+                WhitelistDOMAIN1: signature2,
+                WhitelistDOMAIN2: signature3,
             },
         });
         setSdk(socialLoginSDK);
-    }
+        if (sdk?.provider) {
+            connect();
+        }
+    };
 
-    // 
+    //
 
     const connect = async () => {
         sdk.showWallet();
@@ -128,9 +136,15 @@ function Login() {
         const accounts = await provider.listAccounts();
         setEAddress(accounts);
         sdk.hideWallet();
-        await getUserInfo();
+    
         if (smartAcc) return;
-        
+        const data = [getUserInfo(), getSmartAccount(provider, accounts)]
+        await Promise.all(data);
+
+    };
+
+    const getSmartAccount = async (xProvider, xAccounts) => {
+
         let options = {
             activeNetworkId: ChainId.POLYGON_MUMBAI,
             supportedNetworksIds: [ChainId.POLYGON_MUMBAI],
@@ -143,16 +157,21 @@ function Login() {
             ],
         };
 
-        let smartAccount = new SmartAccount(provider, options);
+        let smartAccount = new SmartAccount(xProvider, options);
         smartAccount = await smartAccount.init();
         dispatch(setSmartAcc(smartAccount));
 
         const { data } = await smartAccount.getSmartAccountsByOwner({
             chainId: 80001,
-            owner: accounts,
+            owner: xAccounts,
         });
         dispatch(setSAddress(data[0].smartAccountAddress));
         // console.log("smart account", sAddress);
+        console.log("bye")
+        console.log("bye")
+        console.log("bye")
+        console.log("bye")
+        console.log("bye")
     }
 
     const disconnect = async () => {
@@ -169,17 +188,23 @@ function Login() {
         window.getSocialLoginSDK = null;
         sdk.hideWallet();
         sdk(null);
-    }
+    };
 
     const getUserInfo = useCallback(async () => {
         if (sdk) {
-            const resUserInfo = await sdk.getUserInfo()
+            const resUserInfo = await sdk.getUserInfo();
             dispatch(setUserInfo(resUserInfo));
             // console.log("userInfo", userInfo);
+            console.log("hey")
+            console.log("hey")
+            console.log("hey")
+            console.log("hey")
+            console.log("hey")
+            console.log("hey")
         }
     }, [sdk]);
 
-    // 
+    //
     // async function initiateTx() {
     //     console.log("started");
 
