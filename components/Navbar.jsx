@@ -33,6 +33,7 @@ export default function Navbar({isHomePage}) {
             {
                 isHomePage ? <LoginWrapper /> : smartAcc ? <div>Logout</div> : <LoginWrapper />
             }
+            {/* { smartAcc ? logout() : login() } */}
             
         </div>
     );

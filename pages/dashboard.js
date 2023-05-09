@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import { useState } from "react";
 import { useSelector } from "react-redux";
 import Image from "next/image";
 import LocationSvg from "../assets/images/location.png"
@@ -47,7 +46,7 @@ export default function Dashboard() {
     
                   <div className="flex gap-2 mt-8 ml-2">
                     <div className="rounded-full p-1 border-white border w-8 h-8">
-                      <Image src={LocationSvg} />
+                      <Image src={LocationSvg} alt=""/>
                     </div>
                     <a className="text-white inline-flex items-center md:mb-2 lg:mb-0">
                       {prop.venue}
