@@ -101,15 +101,15 @@ export default function Login() {
             data.map(async (i) => {
                 const tokenUri = await contract.uri(i.tokenId.toString());
                 // console.log(tokenUri);
-                // const meta = await axios.get(tokenUri + "/");
-                // let price = ethers.utils.formatEther(i.price);
+                const meta = await axios.get(tokenUri + "/");
+                let price = ethers.utils.formatEther(i.price);
                 let item = {
-                    // price,
-                    // name: meta.data.name,
-                    // cover: meta.data.cover,
-                    // description: meta.data.description,
-                    // date: meta.data.date,
-                    // venue: meta.data.venue,
+                    price,
+                    name: meta.data.name,
+                    cover: meta.data.cover,
+                    description: meta.data.description,
+                    date: meta.data.date,
+                    venue: meta.data.venue,
                     supply: i.supply.toNumber(),
                     tokenId: i.tokenId.toNumber(),
                     remaining: i.remaining.toNumber(),
@@ -131,15 +131,15 @@ export default function Login() {
             data.map(async (i) => {
                 const tokenUri = await contract.uri(i.tokenId.toString());
                 // console.log(tokenUri);
-                // const meta = await axios.get(tokenUri + "/");
-                // let price = ethers.utils.formatEther(i.price);
+                const meta = await axios.get(tokenUri + "/");
+                let price = ethers.utils.formatEther(i.price);
                 let item = {
-                    // price,
-                    // name: meta.data.name,
-                    // cover: meta.data.cover,
-                    // description: meta.data.description,
-                    // date: meta.data.date,
-                    // venue: meta.data.venue,
+                    price,
+                    name: meta.data.name,
+                    cover: meta.data.cover,
+                    description: meta.data.description,
+                    date: meta.data.date,
+                    venue: meta.data.venue,
                     supply: i.supply.toNumber(),
                     tokenId: i.tokenId.toNumber(),
                     remaining: i.remaining.toNumber(),
