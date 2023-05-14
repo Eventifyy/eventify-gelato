@@ -3,6 +3,7 @@ import Link from "next/link";
 import LoginWrapper from "./LoginWrapper";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
+import Login from "./Login2";
 
 export default function Navbar({isHomePage}) {
 
@@ -31,9 +32,10 @@ export default function Navbar({isHomePage}) {
                 </li>
             </ul>
             {
-                isHomePage ? <LoginWrapper /> : smartAcc ? <div>Logout</div> : <LoginWrapper />
+                // isHomePage ? <LoginWrapper /> : smartAcc ? <div>Logout</div> : <LoginWrapper />
             }
             {/* { smartAcc ? logout() : login() } */}
+            <Login />
             
         </div>
     );

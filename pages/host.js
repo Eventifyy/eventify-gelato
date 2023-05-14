@@ -109,8 +109,8 @@ export default function Host() {
         console.log("started");
         try {
             setButtonLoading(true);
+            
             const _tokenURI = await metadata();
-
             const _supply = formInput.supply;
 
             const erc20Interface = new ethers.utils.Interface([

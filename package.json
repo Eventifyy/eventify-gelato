@@ -11,6 +11,9 @@
   "dependencies": {
     "@biconomy/smart-account": "^2.0.0",
     "@biconomy/web3-auth": "^2.0.0",
+    "@gelatonetwork/relay-sdk": "^4.0.0",
+    "@particle-network/auth": "^0.13.0",
+    "@particle-network/provider": "^0.13.0",
     "@reduxjs/toolkit": "^1.9.5",
     "autoprefixer": "10.4.14",
     "axios": "^1.4.0",
