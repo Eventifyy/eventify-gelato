@@ -1,14 +1,25 @@
 /* eslint-disable @next/next/no-img-element */
 import { useState } from "react";
 import { Web3Storage } from "web3.storage";
-import { address } from "../config";
+import { address, pn } from "../config";
 import { ethers } from "ethers";
 import { useSelector } from "react-redux";
 import Loader from "@/components/Loader";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+    GelatoRelay,
+    SponsoredCallERC2771Request,
+} from "@gelatonetwork/relay-sdk";
+import { ParticleProvider } from "@particle-network/provider";
+import { ParticleNetwork, WalletEntryPosition } from "@particle-network/auth";
 
 export default function Host() {
+
+    const {  wAddress } = useSelector(
+        (state) => state.login
+    );
+
     const [formInput, setFormInput] = useState({
         // price: "",
         name: "",
@@ -24,10 +35,27 @@ export default function Host() {
     const [tabValue, setTabValue] = useState("upload");
 
     // const [smartAcc, setSmartAcc] = useState();
-    const smartAcc = useSelector((state) => state.login.smartAcc);
+    // const smartAcc = useSelector((state) => state.login.smartAcc);
+    const relay = new GelatoRelay();
+    const GELATO_API = process.env.NEXT_PUBLIC_GELATO_API
 
-    //
+    // const pn = new ParticleNetwork({
+    //     projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+    //     clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY,
+    //     appId: process.env.NEXT_PUBLIC_APP_ID,
+    //     chainName: "polygon", //optional: current chain name, default Ethereum.
+    //     chainId: 80001, //optional: current chain id, default 1.
+    //     wallet: {
+    //         //optional: by default, the wallet entry is displayed in the bottom right corner of the webpage.
+    //         displayWalletEntry: true, //show wallet entry when connect particle.
+    //         defaultWalletEntryPosition: WalletEntryPosition.BR, //wallet entry position
+    //         uiMode: "dark", //optional: light or dark, if not set, the default is the same as web auth.
+    //         supportChains: [{ id: 1, name: "Ethereum" }, {id: 80001, name: "Mumbai"}], // optional: web wallet support chains.
+    //         customStyle: {}, //optional: custom wallet style
+    //     },
+    // });
 
+    // 
     const web3StorageKey = process.env.NEXT_PUBLIC_WEB3STORAGE
 
     function getAccessToken() {
@@ -112,48 +140,35 @@ export default function Host() {
             
             const _tokenURI = await metadata();
             const _supply = formInput.supply;
-
-            const erc20Interface = new ethers.utils.Interface([
-                "function host(uint _supply, string memory _tokenURI)",
-            ]);
-
-            const data = erc20Interface.encodeFunctionData("host", [
-                _supply,
-                _tokenURI,
-            ]);
-
-            const tx1 = {
-                to: address,
-                data,
+     
+            const abi = ["function host(uint _supply, string memory _tokenURI)"];
+    
+            const particleProvider = new ParticleProvider(pn.auth);
+            const ethersProvider = new ethers.providers.Web3Provider(
+                particleProvider,
+                "any"
+            );
+            const signer = ethersProvider.getSigner();
+            
+            const contract = new ethers.Contract(address, abi, signer);
+            const { data } = await contract.host(_supply, _tokenURI);
+    
+            const request = {
+                chainId: "80001",
+                target: address,
+                data: data,
+                user: wAddress,
             };
+    
+            const relayResponse = await relay.sponsoredCallERC2771(
+                request,
+                ethersProvider,
+                GELATO_API
+            );
+    
+            relayResponse.wait()
+            console.log(relayResponse)
 
-            smartAcc.on("txHashGenerated", (response) => {
-                console.log(
-                    "txHashGenerated event received via emitter",
-                    response
-                );
-            });
-            smartAcc.on("onHashChanged", (response) => {
-                console.log(
-                    "onHashChanged event received via emitter",
-                    response
-                );
-            });
-            smartAcc.on("txMined", (response) => {
-                console.log("txMined event received via emitter", response);
-            });
-            smartAcc.on("error", (response) => {
-                console.log("error event received via emitter", response);
-            });
-
-            // Sending gasless transaction
-            const txResponse = await smartAcc.sendTransaction({
-                transaction: tx1,
-            });
-            console.log("userOp hash", txResponse.hash);
-
-            const txReceipt = await txResponse.wait();
-            console.log("Tx hash", txReceipt.transactionHash);
             toast.success("Event hosted successfully", {
                 position: "top-right",
                 autoClose: 5000,
@@ -188,41 +203,35 @@ export default function Host() {
         console.log("started");
         setButtonLoading(true)
 
-        const erc20Interface = new ethers.utils.Interface([
-            "function updatShortlist(uint256 _ticketId, string[] memory _shortlist)",
-        ]);
+        // const contractAddress = "0xAE7e2aD4aAAc74810da24A0E87557304Fe689867";
+        const abi = ["function updatShortlist(uint256 _ticketId, string[] memory _shortlist)"];
 
-        const data = erc20Interface.encodeFunctionData("updatShortlist", [
-            formInput.ticketId,
-            formInput.shortlistArray,
-        ]);
+        const particleProvider = new ParticleProvider(pn.auth);
+        const ethersProvider = new ethers.providers.Web3Provider(
+            particleProvider,
+            "any"
+        );
+        const signer = ethersProvider.getSigner();
+        
+        const contract = new ethers.Contract(address, abi, signer);
+        const { data } = await contract.updatShortlist(formInput.ticketId, formInput.shortlistArray);
 
-        const tx1 = {
-            to: address,
-            data,
+        const request = {
+            chainId: "80001",
+            target: address,
+            data: data,
+            user: wAddress,
         };
 
-        smartAcc.on("txHashGenerated", (response) => {
-            console.log("txHashGenerated event received via emitter", response);
-        });
-        smartAcc.on("onHashChanged", (response) => {
-            console.log("onHashChanged event received via emitter", response);
-        });
-        smartAcc.on("txMined", (response) => {
-            console.log("txMined event received via emitter", response);
-        });
-        smartAcc.on("error", (response) => {
-            console.log("error event received via emitter", response);
-        });
+        const relayResponse = await relay.sponsoredCallERC2771(
+            request,
+            ethersProvider,
+            GELATO_API
+        );
 
-        // Sending gasless transaction
-        const txResponse = await smartAcc.sendTransaction({
-            transaction: tx1,
-        });
-        console.log("userOp hash", txResponse.hash);
+        relayResponse.wait()
+        console.log(relayResponse)
 
-        const txReceipt = await txResponse.wait();
-        console.log("Tx hash", txReceipt.transactionHash);
         setButtonLoading(false)
         toast.success("Participants shortlisted successfully", {
             position: "top-right",

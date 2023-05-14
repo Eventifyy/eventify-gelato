@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { useState } from "react";
-import { address } from "../config";
+import { address, pn } from "../config";
 import { ethers } from "ethers";
 import { useSelector } from "react-redux";
 import LocationSvg from "../assets/images/location.png";
@@ -8,62 +8,76 @@ import Image from "next/image";
 import counter from "../assets/images/counter.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+    GelatoRelay,
+    SponsoredCallERC2771Request,
+} from "@gelatonetwork/relay-sdk";
+import { ParticleProvider } from "@particle-network/provider";
+import { ParticleNetwork, WalletEntryPosition } from "@particle-network/auth";
 
 export default function Events() {
-    const { smartAcc, userInfo, eventItems } = useSelector(
+    // const { smartAcc, userInfo, eventItems } = useSelector(
+    //     (state) => state.login
+    // );
+
+    const { eventItems, userInfo, wAddress } = useSelector(
         (state) => state.login
     );
+
     const [loading, setLoading] = useState(null);
 
+    const relay = new GelatoRelay();
+    const GELATO_API = process.env.NEXT_PUBLIC_GELATO_API
+
+    // const pn = new ParticleNetwork({
+    //     projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+    //     clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY,
+    //     appId: process.env.NEXT_PUBLIC_APP_ID,
+    //     chainName: "polygon", //optional: current chain name, default Ethereum.
+    //     chainId: 80001, //optional: current chain id, default 1.
+    //     wallet: {
+    //         //optional: by default, the wallet entry is displayed in the bottom right corner of the webpage.
+    //         displayWalletEntry: true, //show wallet entry when connect particle.
+    //         defaultWalletEntryPosition: WalletEntryPosition.BR, //wallet entry position
+    //         uiMode: "dark", //optional: light or dark, if not set, the default is the same as web auth.
+    //         supportChains: [{ id: 1, name: "Ethereum" }, {id: 80001, name: "Mumbai"}], // optional: web wallet support chains.
+    //         customStyle: {}, //optional: custom wallet style
+    //     },
+    // });
+
     async function claim(prop) {
-        setLoading(prop.tokenId);
-        console.log("started");
 
         const _ticketId = prop.tokenId;
-        const _email = userInfo.email;
-        console.log(_email);
-        console.log(_ticketId);
+        const _email = userInfo.google_email;
 
-        const erc20Interface = new ethers.utils.Interface([
-            "function claimTicket(uint256 _ticketId, string memory _email)",
-        ]);
+        const abi = ["function claimTicket(uint256 _ticketId, string memory _email)"];
 
-        const data = erc20Interface.encodeFunctionData("claimTicket", [
-            _ticketId,
-            _email,
-        ]);
+        const particleProvider = new ParticleProvider(pn.auth);
+        const ethersProvider = new ethers.providers.Web3Provider(
+            particleProvider,
+            "any"
+        );
+        const signer = ethersProvider.getSigner();
+        
+        const contract = new ethers.Contract(address, abi, signer);
+        const { data } = await contract.claimTicket(_ticketId, _email);
 
-        const tx1 = {
-            to: address,
-            data,
+        const request = {
+            chainId: "80001",
+            target: address,
+            data: data,
+            user: wAddress,
         };
 
-        smartAcc.on("txHashGenerated", (response) => {
-            console.log("txHashGenerated event received via emitter", response);
-        });
-        smartAcc.on("onHashChanged", (response) => {
-            console.log("onHashChanged event received via emitter", response);
-        });
-        smartAcc.on("txMined", (response) => {
-            console.log("txMined event received via emitter", response);
-        });
-        smartAcc.on("error", (response) => {
-            console.log("error event received via emitter", response);
-        });
+        const relayResponse = await relay.sponsoredCallERC2771(
+            request,
+            ethersProvider,
+            GELATO_API
+        );
 
-        // Sending gasless transaction
-        const txResponse = await smartAcc.sendTransaction({
-            transaction: tx1,
-            // gasLimit: 1000000,
-        });
-        console.log("userOp hash", txResponse.hash);
+        relayResponse.wait()
+        console.log(relayResponse)
 
-        const txReceipt = await txResponse.wait();
-        console.log("Tx hash", txReceipt.transactionHash);
-        // fetchEvents()
-        // fetchDashboard()
-
-        console.log(txResponse);
         console.log("done");
         toast.success("Claimed successfully", {
             position: "top-right",

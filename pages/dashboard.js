@@ -5,7 +5,7 @@ import LocationSvg from "../assets/images/location.png"
 
 export default function Dashboard() {
   
-    const { sAddress, userInfo, dashboardItems } = useSelector(
+    const { wAddress, userInfo, dashboardItems } = useSelector(
       (state) => state.login
   );
 
@@ -62,7 +62,7 @@ export default function Dashboard() {
       }
 
     function debug1() {
-        console.log(items)
+        console.log(userInfo)
     }
 
     return (
@@ -92,10 +92,11 @@ export default function Dashboard() {
             </div>
 
             <div className="w-[450px] p-8 py-20 ">
-                <img className="w-20 h-20 rounded-full" src={userInfo?.profileImage} alt="" />
+                <img className="w-20 h-20 rounded-full" src={userInfo?.avatar} alt="" />
                 <p className="mt-3 text-lg capitalize ml-1">{userInfo?.name}</p>
-                <p className="mt-1 text-lg ml-1">{userInfo?.email}</p>
-                <p style={{overflowWrap: "anywhere"}} className="mt-1 text-lg ml-1 whitespace-break-spaces ">{sAddress}</p>
+                <p className="mt-1 text-lg ml-1">{userInfo?.google_email}</p>
+                <p style={{overflowWrap: "anywhere"}} className="mt-1 text-lg ml-1 whitespace-break-spaces ">{wAddress}</p>
+                {/* <button onClick={debug1}>test</button> */}
             </div>
         
 

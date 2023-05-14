@@ -1,4 +1,25 @@
-export const address = `0x40994D85cE91B9E8b52669f4dCeD748D5aF68e3b`
+import { ParticleNetwork, WalletEntryPosition } from "@particle-network/auth";
+
+export const pn = new ParticleNetwork({
+	projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+	clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY,
+	appId: process.env.NEXT_PUBLIC_APP_ID,
+	chainName: "polygon", 
+	chainId: 80001, 
+	// chainName: "bsc", 
+	// chainId: 97, 
+	wallet: {
+		//optional: by default, the wallet entry is displayed in the bottom right corner of the webpage.
+		displayWalletEntry: true, //show wallet entry when connect particle.
+		defaultWalletEntryPosition: WalletEntryPosition.BR, //wallet entry position
+		uiMode: "dark", //optional: light or dark, if not set, the default is the same as web auth.
+		supportChains: [{ id: 1, name: "Ethereum" }, {id: 97, name: "bsc"}], // optional: web wallet support chains.
+		customStyle: {}, //optional: custom wallet style
+	},
+});
+
+// 
+export const address = `0xAE7e2aD4aAAc74810da24A0E87557304Fe689867`
 // export const address = `0xd66073fab30d1Ca7cD5EBC29c2953582628522B5`
 
 export const abi = `[

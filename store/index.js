@@ -4,24 +4,16 @@ import { createSlice } from "@reduxjs/toolkit";
 export const loginSlice = createSlice({
   name: "login",
   initialState: {
-    eAddress: "",
-    sAddress: "",
+    wAddress: "",
     userInfo: "",
-    smartAcc: "",
     eventItems: [],
     dashboardItems: []
   },
   reducers: {
-    setEAddress: (state, action) => {
-      state.eAddress = action.payload;
+    setAccount: (state, action) => {
+      state.wAddress = action.payload;
     },
-    setSAddress: (state, action) => {
-        state.sAddress = action.payload
-    },
-    setSmartAcc: (state, action) => {
-      state.smartAcc = action.payload;
-    },
-    setUserInfo: (state, action) => {
+    setUser: (state, action) => {
         state.userInfo = action.payload
     },
     setEventItems: (state, action) => {
@@ -42,4 +34,4 @@ const store = configureStore({
 export default store;
 
 // export the action
-export const { setEAddress, setSAddress, setSmartAcc, setUserInfo, setEventItems, setDashboardItems } = loginSlice.actions;
+export const { setAccount, setUser, setEventItems, setDashboardItems } = loginSlice.actions;

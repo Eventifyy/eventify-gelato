@@ -1,147 +1,98 @@
-import SocialLogin from "@biconomy/web3-auth";
-import { ChainId } from "@biconomy/core-types";
-import SmartAccount from "@biconomy/smart-account";
-import "@biconomy/web3-auth/dist/src/style.css";
-import { useEffect, useState, useCallback, memo } from "react";
+import { ParticleNetwork, WalletEntryPosition } from "@particle-network/auth";
+import { ParticleProvider } from "@particle-network/provider";
 import { ethers } from "ethers";
-import { useDispatch, useSelector } from "react-redux";
-import { setSmartAcc, setUserInfo, setSAddress, setEAddress } from "../store/index.js";
-import { setEventItems, setDashboardItems } from "../store/index.js";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { address, abi } from "../config";
+import { address, abi, pn } from "../config";
+import {
+    GelatoRelay,
+    SponsoredCallERC2771Request,
+} from "@gelatonetwork/relay-sdk";
+import {setAccount, setUser, setEventItems, setDashboardItems  } from "../store/index.js";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
-function Login() {
-    const dispatch = useDispatch();
-    const [sdk, setSdk] = useState();
-    const { smartAcc, sAddress, userInfo, eAddress } = useSelector(
+export default function Login() {
+    
+    const dispatch = useDispatch()
+
+    const [logged, setLogged] = useState(null);
+    const { wAddress, userInfo, eventItems, dashboardItems } = useSelector(
         (state) => state.login
     );
-    const { eventItems, dashboardItems } = useSelector((state) => state.login);
-    // const [eAddress, setEAddress] = useState();
-
-    const WhitelistDOMAIN1 = process.env.NEXT_PUBLIC_WhitelistDOMAIN1;
-    const WhitelistDOMAIN2 = process.env.NEXT_PUBLIC_WhitelistDOMAIN2;
+    
     const ALCHEMY_ID = process.env.NEXT_PUBLIC_ALCHEMY;
-    const BiconomyAPI = process.env.NEXT_PUBLIC_BiconomyAPI;
-
     const provider = new ethers.providers.JsonRpcProvider(
         `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`
     );
 
+    // const pn = new ParticleNetwork({
+    //     projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+    //     clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY,
+    //     appId: process.env.NEXT_PUBLIC_APP_ID,
+    //     chainName: "polygon", //optional: current chain name, default Ethereum.
+    //     chainId: 80001, //optional: current chain id, default 1.
+    //     wallet: {
+    //         //optional: by default, the wallet entry is displayed in the bottom right corner of the webpage.
+    //         displayWalletEntry: true, //show wallet entry when connect particle.
+    //         defaultWalletEntryPosition: WalletEntryPosition.BR, //wallet entry position
+    //         uiMode: "dark", //optional: light or dark, if not set, the default is the same as web auth.
+    //         supportChains: [{ id: 1, name: "Ethereum" }, {id: 80001, name: "Mumbai"}], // optional: web wallet support chains.
+    //         customStyle: {}, //optional: custom wallet style
+    //     },
+    // });
+
+    pn.setAuthTheme({
+        uiMode: "light",
+        displayCloseButton: true,
+        displayWallet: true, // display wallet entrance when send transaction.
+        modalBorderRadius: 10, // auth & wallet modal border radius. default 10.
+    });
+
     useEffect(() => {
-        initiate();
+        checkLogin();
         fetchEvents();
-    }, []);
+    }, [wAddress, userInfo]);
 
-    useEffect(() => {
-        if (sdk?.provider && smartAcc == "") {
-            connect();
+    const checkLogin = async () => {
+        let result = pn.auth.isLogin();
+        if (result) {
+            // getUserInfo()
         }
-    }, [sdk]);
+        setLogged(result);
+    };
 
-    const initiate = async () => {
-        const socialLoginSDK = new SocialLogin();
-
-        const signature = await socialLoginSDK.whitelistUrl(
-            "http://localhost:3000/"
-        );
-        const signature2 = await socialLoginSDK.whitelistUrl(
-            `${WhitelistDOMAIN1}`
-        );
-        const signature3 = await socialLoginSDK.whitelistUrl(
-            `${WhitelistDOMAIN2}`
-        );
-        await socialLoginSDK.init({
-            whitelistUrls: {
-                "http://localhost:3000/": signature,
-                WhitelistDOMAIN1: signature2,
-                WhitelistDOMAIN2: signature3,
-            },
+    const login = async () => {
+        await pn.auth.login({
+            preferredAuthType: "google",
         });
-        setSdk(socialLoginSDK);
-        if (sdk?.provider) {
-            connect();
-        }
+        // await pn.auth.login()
+        const particleProvider = new ParticleProvider(pn.auth);
+        const ethersProvider = new ethers.providers.Web3Provider(
+            particleProvider,
+            "any"
+        );
+
+        const accounts = await ethersProvider.listAccounts();
+
+        dispatch(setAccount(accounts));
+        getUserInfo();
+        await fetchDashboard(accounts);
     };
 
-    //
-
-    const connect = async () => {
-        sdk.showWallet();
-        if (!sdk?.provider) return;
-        const provider = new ethers.providers.Web3Provider(sdk.provider);
-        // const walletProvider = new ethers.providers.Web3Provider(provider);
-        const accounts = await provider.listAccounts();
-        setEAddress(accounts);
-        sdk.hideWallet();
-    
-        if (smartAcc) return;
-        const data = [getUserInfo(), getSmartAccount(provider, accounts)]
-        await Promise.all(data);
-
-    };
-
-    const getSmartAccount = async (xProvider, xAccounts) => {
-
-        let options = {
-            activeNetworkId: ChainId.POLYGON_MUMBAI,
-            supportedNetworksIds: [ChainId.POLYGON_MUMBAI],
-            networkConfig: [
-                {
-                    chainId: ChainId.POLYGON_MUMBAI,
-                    dappAPIKey: BiconomyAPI,
-                    providerUrl: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
-                },
-            ],
-        };
-
-        let smartAccount = new SmartAccount(xProvider, options);
-        smartAccount = await smartAccount.init();
-        dispatch(setSmartAcc(smartAccount));
-
-        const { data } = await smartAccount.getSmartAccountsByOwner({
-            chainId: 80001,
-            owner: xAccounts,
+    const logout = async () => {
+        pn.auth.logout().then(() => {
+            console.log("logout");
+            dispatch(setAccount(null));
+            dispatch(setUser(null));
         });
-        dispatch(setSAddress(data[0].smartAccountAddress));
-        fetchDashboard(data[0].smartAccountAddress)
-        // console.log("smart account", sAddress);
-        console.log("sAddr")
-        console.log("sAddr")
-        console.log("sAddr")
-        console.log("sAddr")
-        console.log("sAddr")
-        console.log("sAddr")
-    }
-
-    const disconnect = async () => {
-        if (!sdk || !sdk.web3auth) {
-            console.error("Web3Modal not initialized.");
-            return;
-        }
-        await sdk.logout();
-        dispatch(setEAddress(null));
-        dispatch(setSAddress(null));
-        dispatch(setSmartAcc(null));
-        dispatch(setUserInfo(null));
-        window.getSocialLoginSDK = null;
-        sdk.hideWallet();
-        setSdk(null);
     };
 
-    const getUserInfo = useCallback(async () => {
-        if (sdk) {
-            const resUserInfo = await sdk.getUserInfo();
-            dispatch(setUserInfo(resUserInfo));
-            // console.log("userInfo", userInfo);
-            console.log("uInfo")
-            console.log("uInfo")
-            console.log("uInfo")
-            console.log("uInfo")
-            console.log("uInfo")
-            console.log("uInfo")
-        }
-    }, [sdk]);
+    const getUserInfo = async () => {
+        const info = pn.auth.userInfo();
+        dispatch(setUser(info));
+        console.log(info);
+    };
 
     const fetchEvents = async () => {
         const contract = new ethers.Contract(address, abi, provider);
@@ -150,15 +101,15 @@ function Login() {
             data.map(async (i) => {
                 const tokenUri = await contract.uri(i.tokenId.toString());
                 // console.log(tokenUri);
-                const meta = await axios.get(tokenUri + "/");
+                // const meta = await axios.get(tokenUri + "/");
                 // let price = ethers.utils.formatEther(i.price);
                 let item = {
                     // price,
-                    name: meta.data.name,
-                    cover: meta.data.cover,
-                    description: meta.data.description,
-                    date: meta.data.date,
-                    venue: meta.data.venue,
+                    // name: meta.data.name,
+                    // cover: meta.data.cover,
+                    // description: meta.data.description,
+                    // date: meta.data.date,
+                    // venue: meta.data.venue,
                     supply: i.supply.toNumber(),
                     tokenId: i.tokenId.toNumber(),
                     remaining: i.remaining.toNumber(),
@@ -172,23 +123,23 @@ function Login() {
         console.log("events", eventItems);
     };
 
-    const fetchDashboard = async (sAddr) => {
+    const fetchDashboard = async (userAddress) => {
         const contract = new ethers.Contract(address, abi, provider);
-        const data = await contract.inventory(sAddr);
+        const data = await contract.inventory(userAddress);
         // const data = await contract.activeEvents();
         const itemsFetched = await Promise.all(
             data.map(async (i) => {
                 const tokenUri = await contract.uri(i.tokenId.toString());
                 // console.log(tokenUri);
-                const meta = await axios.get(tokenUri + "/");
+                // const meta = await axios.get(tokenUri + "/");
                 // let price = ethers.utils.formatEther(i.price);
                 let item = {
                     // price,
-                    name: meta.data.name,
-                    cover: meta.data.cover,
-                    description: meta.data.description,
-                    date: meta.data.date,
-                    venue: meta.data.venue,
+                    // name: meta.data.name,
+                    // cover: meta.data.cover,
+                    // description: meta.data.description,
+                    // date: meta.data.date,
+                    // venue: meta.data.venue,
                     supply: i.supply.toNumber(),
                     tokenId: i.tokenId.toNumber(),
                     remaining: i.remaining.toNumber(),
@@ -202,68 +153,137 @@ function Login() {
         console.log("dashboard", dashboardItems);
     };
 
-    //
-    // async function initiateTx() {
-    //     console.log("started");
 
-    //     const recipientAddress = `0x48e6a467852Fa29710AaaCDB275F85db4Fa420eB`;
-    //     const calculatedAmount = 10 * Math.pow(10, 18);
-    //     const amount = `${calculatedAmount}`;
-    //     const usdcAddress = `0xE73305E0727b615592f54432873592792ccdBfFa`;
+    // 
 
-    //     console.log(amount);
+    // const relay = new GelatoRelay();
 
-    //     const erc20Interface = new ethers.utils.Interface([
-    //         "function transfer(address _to, uint256 _value)",
-    //     ]);
-    //     // Encode an ERC-20 token transfer to recipient of the specified amount
-    //     const data = erc20Interface.encodeFunctionData("transfer", [
-    //         recipientAddress,
-    //         amount,
-    //     ]);
+    // async function host() {
 
-    //     const tx1 = {
-    //         to: usdcAddress,
-    //         data,
+    //     const _tokenURI = await metadata();
+    //     const _supply = formInput.supply;
+ 
+    //     const contractAddress = "0xAE7e2aD4aAAc74810da24A0E87557304Fe689867";
+    //     const abi = ["function host(uint _supply, string memory _tokenURI)"];
+
+    //     const particleProvider = new ParticleProvider(pn.auth);
+    //     const ethersProvider = new ethers.providers.Web3Provider(
+    //         particleProvider,
+    //         "any"
+    //     );
+    //     const signer = ethersProvider.getSigner();
+        
+    //     const contract = new ethers.Contract(contractAddress, abi, signer);
+    //     const { data } = await contract.host(_supply, _tokenURI);
+
+    //     const request = {
+    //         chainId: "80001",
+    //         target: contractAddress,
+    //         data: data,
+    //         user: wAddress,
     //     };
 
-    //     smartAcc.on("txHashGenerated", (response) => {
-    //         console.log("txHashGenerated event received via emitter", response);
-    //     });
-    //     smartAcc.on("onHashChanged", (response) => {
-    //         console.log("onHashChanged event received via emitter", response);
-    //     });
+    //     const relayResponse = await relay.sponsoredCallERC2771(
+    //         request,
+    //         ethersProvider,
+    //         GELATO_API
+    //     );
 
-    //     smartAcc.on("txMined", (response) => {
-    //         console.log("txMined event received via emitter", response);
-    //     });
-
-    //     smartAcc.on("error", (response) => {
-    //         console.log("error event received via emitter", response);
-    //     });
-
-    //     const txResponse = await smartAcc.sendTransaction({
-    //         transaction: tx1,
-    //     });
-    //     console.log("userOp hash", txResponse.hash);
-
-    //     const txReceipt = await txResponse.wait();
-    //     console.log("Tx hash", txReceipt.transactionHash);
-
-    //     console.log("done");
+    //     relayResponse.wait()
+    //     console.log(relayResponse)
     // }
-    //
+
+    // async function claim() {
+
+    //     const _ticketId = prop.tokenId;
+    //     const _email = userInfo.email;
+
+    //     const contractAddress = "0xAE7e2aD4aAAc74810da24A0E87557304Fe689867";
+    //     const abi = ["function claimTicket(uint256 _ticketId, string memory _email)"];
+
+    //     const particleProvider = new ParticleProvider(pn.auth);
+    //     const ethersProvider = new ethers.providers.Web3Provider(
+    //         particleProvider,
+    //         "any"
+    //     );
+    //     const signer = ethersProvider.getSigner();
+        
+    //     const contract = new ethers.Contract(contractAddress, abi, signer);
+    //     const { data } = await contract.claimTicket(_ticketId, _email);
+
+    //     const request = {
+    //         chainId: "80001",
+    //         target: contractAddress,
+    //         data: data,
+    //         user: wAddress,
+    //     };
+
+    //     const relayResponse = await relay.sponsoredCallERC2771(
+    //         request,
+    //         ethersProvider,
+    //         GELATO_API
+    //     );
+
+    //     relayResponse.wait()
+    //     console.log(relayResponse)
+    // }
+
+    // async function shortlist() {
+
+    //     const _ticketId = prop.tokenId;
+    //     const _email = userInfo.email;
+
+    //     const contractAddress = "0xAE7e2aD4aAAc74810da24A0E87557304Fe689867";
+    //     const abi = ["function updatShortlist(uint256 _ticketId, string[] memory _shortlist)"];
+
+    //     const particleProvider = new ParticleProvider(pn.auth);
+    //     const ethersProvider = new ethers.providers.Web3Provider(
+    //         particleProvider,
+    //         "any"
+    //     );
+    //     const signer = ethersProvider.getSigner();
+        
+    //     const contract = new ethers.Contract(contractAddress, abi, signer);
+    //     const { data } = await contract.claimTicket(formInput.ticketId, formInput.shortlistArray);
+
+    //     const request = {
+    //         chainId: "80001",
+    //         target: contractAddress,
+    //         data: data,
+    //         user: wAddress,
+    //     };
+
+    //     const relayResponse = await relay.sponsoredCallERC2771(
+    //         request,
+    //         ethersProvider,
+    //         GELATO_API
+    //     );
+
+    //     relayResponse.wait()
+    //     console.log(relayResponse)
+    // }
+
+    // 
+
+    function debug() {
+        // console.log(wProvider);
+        sendTx();
+    }
+
+    function debug1() {
+        logout()
+    }
 
     return (
         <div>
-            {sdk?.provider ? (
-                <button onClick={disconnect}>Logout</button>
+            {logged ? (
+                <button onClick={logout}>logout</button>
             ) : (
-                <button onClick={connect}>Login</button>
+                <button onClick={login}>login</button>
             )}
-            {/* <Middleware /> */}
+            {/* <p>{address}</p> */}
+            {/* <button onClick={debug}>check</button>
+            <button onClick={debug1}>check</button> */}
         </div>
     );
 }
-
-export default memo(Login);
