@@ -1,5 +1,8 @@
 import { ParticleNetwork, WalletEntryPosition } from "@particle-network/auth";
 
+
+export const address = `0x419EDD596181732E08DF4b14C5891607909EDDAd`
+
 export const pn = new ParticleNetwork({
 	projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
 	clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY,
@@ -17,10 +20,6 @@ export const pn = new ParticleNetwork({
 		customStyle: {}, //optional: custom wallet style
 	},
 });
-
-// 
-export const address = `0xAE7e2aD4aAAc74810da24A0E87557304Fe689867`
-// export const address = `0xd66073fab30d1Ca7cD5EBC29c2953582628522B5`
 
 export const abi = `[
 	{
