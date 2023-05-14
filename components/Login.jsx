@@ -102,9 +102,9 @@ export default function Login() {
                 const tokenUri = await contract.uri(i.tokenId.toString());
                 // console.log(tokenUri);
                 const meta = await axios.get(tokenUri + "/");
-                let price = ethers.utils.formatEther(i.price);
+                // let price = ethers.utils.formatEther(i.price);
                 let item = {
-                    price,
+                    // price,
                     name: meta.data.name,
                     cover: meta.data.cover,
                     description: meta.data.description,
@@ -132,9 +132,9 @@ export default function Login() {
                 const tokenUri = await contract.uri(i.tokenId.toString());
                 // console.log(tokenUri);
                 const meta = await axios.get(tokenUri + "/");
-                let price = ethers.utils.formatEther(i.price);
+                // let price = ethers.utils.formatEther(i.price);
                 let item = {
-                    price,
+                    // price,
                     name: meta.data.name,
                     cover: meta.data.cover,
                     description: meta.data.description,
