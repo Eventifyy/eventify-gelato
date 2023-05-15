@@ -91,6 +91,8 @@ export default function Events() {
         });
         setLoading(null);
     }
+    
+    console.log(userInfo.google_email)
 
     function Card(prop) {
         const date = new Date(prop.date);

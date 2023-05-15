@@ -1,46 +1,34 @@
 import { ParticleNetwork, WalletEntryPosition } from "@particle-network/auth";
 import { ParticleProvider } from "@particle-network/provider";
 import { ethers } from "ethers";
-import { useEffect, useState } from "react";
+import { useDebugValue, useEffect, useState } from "react";
 import axios from "axios";
 import { address, abi, pn } from "../config";
 import {
     GelatoRelay,
     SponsoredCallERC2771Request,
 } from "@gelatonetwork/relay-sdk";
-import {setAccount, setUser, setEventItems, setDashboardItems  } from "../store/index.js";
+import {
+    setAccount,
+    setUser,
+    setEventItems,
+    setDashboardItems,
+} from "../store/index.js";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 
 export default function Login() {
-    
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
 
     const [logged, setLogged] = useState(null);
     const { wAddress, userInfo, eventItems, dashboardItems } = useSelector(
         (state) => state.login
     );
-    
+
     const ALCHEMY_ID = process.env.NEXT_PUBLIC_ALCHEMY;
     const provider = new ethers.providers.JsonRpcProvider(
         `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`
     );
-
-    // const pn = new ParticleNetwork({
-    //     projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-    //     clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY,
-    //     appId: process.env.NEXT_PUBLIC_APP_ID,
-    //     chainName: "polygon", //optional: current chain name, default Ethereum.
-    //     chainId: 80001, //optional: current chain id, default 1.
-    //     wallet: {
-    //         //optional: by default, the wallet entry is displayed in the bottom right corner of the webpage.
-    //         displayWalletEntry: true, //show wallet entry when connect particle.
-    //         defaultWalletEntryPosition: WalletEntryPosition.BR, //wallet entry position
-    //         uiMode: "dark", //optional: light or dark, if not set, the default is the same as web auth.
-    //         supportChains: [{ id: 1, name: "Ethereum" }, {id: 80001, name: "Mumbai"}], // optional: web wallet support chains.
-    //         customStyle: {}, //optional: custom wallet style
-    //     },
-    // });
 
     pn.setAuthTheme({
         uiMode: "light",
@@ -52,13 +40,18 @@ export default function Login() {
     useEffect(() => {
         checkLogin();
         fetchEvents();
+
+        if (userInfo == "") {
+            getUserInfo();
+            fetchAccount();
+        }
+        if (wAddress != "") {
+            fetchDashboard(wAddress);
+        }
     }, [wAddress, userInfo]);
 
     const checkLogin = async () => {
         let result = pn.auth.isLogin();
-        if (result) {
-            // getUserInfo()
-        }
         setLogged(result);
     };
 
@@ -66,7 +59,12 @@ export default function Login() {
         await pn.auth.login({
             preferredAuthType: "google",
         });
-        // await pn.auth.login()
+        fetchAccount();
+        getUserInfo();
+        await fetchDashboard(accounts);
+    };
+
+    const fetchAccount = async () => {
         const particleProvider = new ParticleProvider(pn.auth);
         const ethersProvider = new ethers.providers.Web3Provider(
             particleProvider,
@@ -76,8 +74,6 @@ export default function Login() {
         const accounts = await ethersProvider.listAccounts();
 
         dispatch(setAccount(accounts));
-        getUserInfo();
-        await fetchDashboard(accounts);
     };
 
     const logout = async () => {
@@ -153,8 +149,7 @@ export default function Login() {
         console.log("dashboard", dashboardItems);
     };
 
-
-    // 
+    //
 
     // const relay = new GelatoRelay();
 
@@ -162,7 +157,7 @@ export default function Login() {
 
     //     const _tokenURI = await metadata();
     //     const _supply = formInput.supply;
- 
+
     //     const contractAddress = "0xAE7e2aD4aAAc74810da24A0E87557304Fe689867";
     //     const abi = ["function host(uint _supply, string memory _tokenURI)"];
 
@@ -172,7 +167,7 @@ export default function Login() {
     //         "any"
     //     );
     //     const signer = ethersProvider.getSigner();
-        
+
     //     const contract = new ethers.Contract(contractAddress, abi, signer);
     //     const { data } = await contract.host(_supply, _tokenURI);
 
@@ -207,7 +202,7 @@ export default function Login() {
     //         "any"
     //     );
     //     const signer = ethersProvider.getSigner();
-        
+
     //     const contract = new ethers.Contract(contractAddress, abi, signer);
     //     const { data } = await contract.claimTicket(_ticketId, _email);
 
@@ -242,7 +237,7 @@ export default function Login() {
     //         "any"
     //     );
     //     const signer = ethersProvider.getSigner();
-        
+
     //     const contract = new ethers.Contract(contractAddress, abi, signer);
     //     const { data } = await contract.claimTicket(formInput.ticketId, formInput.shortlistArray);
 
@@ -263,7 +258,7 @@ export default function Login() {
     //     console.log(relayResponse)
     // }
 
-    // 
+    //
 
     function debug() {
         // console.log(wProvider);
@@ -271,7 +266,7 @@ export default function Login() {
     }
 
     function debug1() {
-        logout()
+        logout();
     }
 
     return (
