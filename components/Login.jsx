@@ -46,6 +46,7 @@ export default function Login() {
             fetchAccount();
         }
         if (wAddress != "") {
+            console.log(wAddress);
             fetchDashboard(wAddress);
         }
     }, [wAddress, userInfo]);
@@ -59,9 +60,10 @@ export default function Login() {
         await pn.auth.login({
             preferredAuthType: "google",
         });
-        fetchAccount();
-        getUserInfo();
-        await fetchDashboard(accounts);
+        console.log(wAddress);
+        await fetchAccount();
+        await getUserInfo();
+        await fetchDashboard(wAddress);
     };
 
     const fetchAccount = async () => {
@@ -73,7 +75,7 @@ export default function Login() {
 
         const accounts = await ethersProvider.listAccounts();
 
-        dispatch(setAccount(accounts));
+        dispatch(setAccount(accounts[0]));
     };
 
     const logout = async () => {
