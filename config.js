@@ -2,6 +2,7 @@ import { ParticleNetwork, WalletEntryPosition } from "@particle-network/auth";
 
 
 export const address = `0x419EDD596181732E08DF4b14C5891607909EDDAd`
+// export const address = `0x419EDD596181732E08DF4b14C5891607909EDDAd`
 
 export const pn = new ParticleNetwork({
 	projectId: process.env.NEXT_PUBLIC_PROJECT_ID,

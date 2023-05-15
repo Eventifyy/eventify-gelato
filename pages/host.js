@@ -12,12 +12,15 @@ import {
     SponsoredCallERC2771Request,
 } from "@gelatonetwork/relay-sdk";
 import { ParticleProvider } from "@particle-network/provider";
+import { fetchEvents } from "@/functions";
+
+import { setEventItems } from "../store/index.js";
+import { useDispatch } from "react-redux";
 
 export default function Host() {
+    const dispatch = useDispatch();
 
-    const {  wAddress } = useSelector(
-        (state) => state.login
-    );
+    const { wAddress } = useSelector((state) => state.login);
 
     const [formInput, setFormInput] = useState({
         // price: "",
@@ -36,7 +39,7 @@ export default function Host() {
     // const [smartAcc, setSmartAcc] = useState();
     // const smartAcc = useSelector((state) => state.login.smartAcc);
     const relay = new GelatoRelay();
-    const GELATO_API = process.env.NEXT_PUBLIC_GELATO_API
+    const GELATO_API = process.env.NEXT_PUBLIC_GELATO_API;
 
     // const pn = new ParticleNetwork({
     //     projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
@@ -54,11 +57,11 @@ export default function Host() {
     //     },
     // });
 
-    // 
-    const web3StorageKey = process.env.NEXT_PUBLIC_WEB3STORAGE
+    //
+    const web3StorageKey = process.env.NEXT_PUBLIC_WEB3STORAGE;
 
     function getAccessToken() {
-        return web3StorageKey
+        return web3StorageKey;
     }
 
     function makeStorageClient() {
@@ -136,37 +139,43 @@ export default function Host() {
         console.log("started");
         try {
             setButtonLoading(true);
-            
+
             const _tokenURI = await metadata();
             const _supply = formInput.supply;
-     
-            const abi = ["function host(uint _supply, string memory _tokenURI)"];
-    
+
+            const abi = [
+                "function host(uint _supply, string memory _tokenURI)",
+            ];
+
             const particleProvider = new ParticleProvider(pn.auth);
             const ethersProvider = new ethers.providers.Web3Provider(
                 particleProvider,
                 "any"
             );
             const signer = ethersProvider.getSigner();
-            
+
             const contract = new ethers.Contract(address, abi, signer);
             const { data } = await contract.host(_supply, _tokenURI);
-    
+
             const request = {
                 chainId: "80001",
                 target: address,
                 data: data,
                 user: wAddress,
             };
-    
+
             const relayResponse = await relay.sponsoredCallERC2771(
                 request,
                 ethersProvider,
                 GELATO_API
             );
-    
-            relayResponse.wait()
-            console.log(relayResponse)
+
+            relayResponse.wait();
+            console.log(relayResponse);
+
+            fetchEvents().then((resp) => {
+                dispatch(setEventItems(resp));
+            });
 
             toast.success("Event hosted successfully", {
                 position: "top-right",
@@ -200,10 +209,12 @@ export default function Host() {
     //
     async function updateShortlist() {
         console.log("started");
-        setButtonLoading(true)
+        setButtonLoading(true);
 
         // const contractAddress = "0xAE7e2aD4aAAc74810da24A0E87557304Fe689867";
-        const abi = ["function updatShortlist(uint256 _ticketId, string[] memory _shortlist)"];
+        const abi = [
+            "function updatShortlist(uint256 _ticketId, string[] memory _shortlist)",
+        ];
 
         const particleProvider = new ParticleProvider(pn.auth);
         const ethersProvider = new ethers.providers.Web3Provider(
@@ -211,9 +222,12 @@ export default function Host() {
             "any"
         );
         const signer = ethersProvider.getSigner();
-        
+
         const contract = new ethers.Contract(address, abi, signer);
-        const { data } = await contract.updatShortlist(formInput.ticketId, formInput.shortlistArray);
+        const { data } = await contract.updatShortlist(
+            formInput.ticketId,
+            formInput.shortlistArray
+        );
 
         const request = {
             chainId: "80001",
@@ -228,10 +242,10 @@ export default function Host() {
             GELATO_API
         );
 
-        relayResponse.wait()
-        console.log(relayResponse)
+        relayResponse.wait();
+        console.log(relayResponse);
 
-        setButtonLoading(false)
+        setButtonLoading(false);
         toast.success("Participants shortlisted successfully", {
             position: "top-right",
             autoClose: 5000,
@@ -433,46 +447,49 @@ export default function Host() {
             <div>
                 <div className="flex gap-5 flex-col w-full mx-auto relative eFTMrM !container rounded-3xl overflow-hidden">
                     <div class="styles__AuthBlurBackground-sc-17gk2ab-12 kaEhpi "></div>
-                <div>
-                    <input
-                        className="inputs"
-                        type="number"
-                        name="ticketId"
-                        placeholder="Ticket Id"
-                        onChange={(e) =>
-                            setFormInput({
-                                ...formInput,
-                                ticketId: e.target.value,
-                            })
-                        }
-                        required
-                    />
-                </div>
+                    <div>
+                        <input
+                            className="inputs"
+                            type="number"
+                            name="ticketId"
+                            placeholder="Ticket Id"
+                            onChange={(e) =>
+                                setFormInput({
+                                    ...formInput,
+                                    ticketId: e.target.value,
+                                })
+                            }
+                            required
+                        />
+                    </div>
 
-                <div>
-                    <input
-                        className="inputs"
-                        type="text"
-                        name="shortlistArray"
-                        placeholder="Shortlist"
-                        onChange={(e) => {
-                            setFormInput({
-                                ...formInput,
-                                shortlistArray: e.target.value?.split(","),
-                            });
-                        }}
-                        required
-                    />
-                </div>
+                    <div>
+                        <input
+                            className="inputs"
+                            type="text"
+                            name="shortlistArray"
+                            placeholder="Shortlist"
+                            onChange={(e) => {
+                                setFormInput({
+                                    ...formInput,
+                                    shortlistArray: e.target.value?.split(","),
+                                });
+                            }}
+                            required
+                        />
+                    </div>
 
-                <button onClick={updateShortlist} className="flex flex-row justify-center items-center
+                    <button
+                        onClick={updateShortlist}
+                        className="flex flex-row justify-center items-center
                   w-full text-white text-md bg-[#8A42D8]
                   py-2 px-5 rounded-full
                   drop-shadow-xl border border-transparent
                   hover:bg-transparent hover:text-[#8A42D8]
                   hover:border hover:bg-indigo-700
-                  focus:outline-none focus:ring mt-5">
-                    {buttonLoading ? (
+                  focus:outline-none focus:ring mt-5"
+                    >
+                        {buttonLoading ? (
                             <svg
                                 aria-hidden="true"
                                 role="status"
@@ -491,9 +508,9 @@ export default function Host() {
                                 />
                             </svg>
                         ) : null}
-                    Upload
+                        Upload
                     </button>
-            </div>
+                </div>
             </div>
         );
     }
@@ -514,17 +531,23 @@ export default function Host() {
             />
             {/* <p>test</p>
       <button onClick={initiateTx}>test</button> */}
-                     {/* <h2 className="text-white text-3xl text-center mb-7 mt-3">
+            {/* <h2 className="text-white text-3xl text-center mb-7 mt-3">
                     User 
                 </h2> */}
-                 <div className="tabs !mx-auto !mb-4 !mt-14">
-                    <button onClick={() => setTabValue("upload")} className={tabValue === "upload" ? "active" : ""}>
-                        Host
-                    </button>
-                    <button onClick={() => setTabValue("shortlist")} className={tabValue === "shortlist" ? "active" : ""}>
-                        Shortlist
-                    </button>
-                </div>
+            <div className="tabs !mx-auto !mb-4 !mt-14">
+                <button
+                    onClick={() => setTabValue("upload")}
+                    className={tabValue === "upload" ? "active" : ""}
+                >
+                    Host
+                </button>
+                <button
+                    onClick={() => setTabValue("shortlist")}
+                    className={tabValue === "shortlist" ? "active" : ""}
+                >
+                    Shortlist
+                </button>
+            </div>
 
             {tabValue === "upload" ? renderHost() : renderShortlist()}
         </div>
