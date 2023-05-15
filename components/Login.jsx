@@ -21,9 +21,9 @@ export default function Login() {
     );
 
     const ALCHEMY_ID = process.env.NEXT_PUBLIC_ALCHEMY;
-    const provider = new ethers.providers.JsonRpcProvider(
-        `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`
-    );
+    // const provider = new ethers.providers.JsonRpcProvider(
+    //     `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`
+    // );
 
     pn.setAuthTheme({
         uiMode: "light",
@@ -32,23 +32,35 @@ export default function Login() {
         modalBorderRadius: 10, // auth & wallet modal border radius. default 10.
     });
 
+    const particleProvider = new ParticleProvider(pn.auth);
+    const ethersProvider = new ethers.providers.Web3Provider(
+        particleProvider,
+        "any"
+    );
+
     useEffect(() => {
         checkLogin();
-        fetchEvents();
-
-        if ( userInfo == "") {
-            getUserInfo();
-            fetchAccount();
-        }
-        if (wAddress != "") {
-            console.log("wAddress", wAddress);
-            fetchDashboard(wAddress);
-        }
     }, [wAddress, userInfo]);
 
-    const checkLogin = async () => {
+    useEffect(() => {
+        fetchEvents();
+        const isLogged = checkLogin();
+        if (userInfo == "" && isLogged) {
+            getUserInfo();
+            if (localStorage.getItem("wAddress")) {
+                let wAddressLocal = localStorage.getItem("wAddress");
+                dispatch(setAccount(wAddressLocal));
+                fetchDashboard(wAddressLocal);
+            } else {
+                fetchAccount();
+            }
+        }
+    }, []);
+
+    const checkLogin = () => {
         let result = pn.auth.isLogin();
         setLogged(result);
+        return result;
     };
 
     const login = async () => {
@@ -56,21 +68,15 @@ export default function Login() {
             preferredAuthType: "google",
         });
         console.log("wAddress", wAddress);
-        await fetchAccount();
-        await getUserInfo();
-        await fetchDashboard(wAddress);
+        getUserInfo();
+        fetchAccount();
     };
 
     const fetchAccount = async () => {
-        const particleProvider = new ParticleProvider(pn.auth);
-        const ethersProvider = new ethers.providers.Web3Provider(
-            particleProvider,
-            "any"
-        );
-
         const accounts = await ethersProvider.listAccounts();
-
         dispatch(setAccount(accounts[0]));
+        fetchDashboard(accounts[0]);
+        localStorage.setItem("wAddress", accounts[0]);
     };
 
     const logout = async () => {
@@ -81,14 +87,14 @@ export default function Login() {
         });
     };
 
-    const getUserInfo = async () => {
+    const getUserInfo = () => {
         const info = pn.auth.userInfo();
         dispatch(setUser(info));
         console.log(info);
     };
 
     const fetchEvents = async () => {
-        const contract = new ethers.Contract(address, abi, provider);
+        const contract = new ethers.Contract(address, abi, ethersProvider);
         const data = await contract.activeEvents();
         const itemsFetched = await Promise.all(
             data.map(async (i) => {
@@ -113,12 +119,12 @@ export default function Login() {
         );
 
         dispatch(setEventItems(itemsFetched));
-        console.log("events", eventItems);
+        console.log("events", itemsFetched);
     };
 
-    const fetchDashboard = async (userAddress) => {
-        const contract = new ethers.Contract(address, abi, provider);
-        const data = await contract.inventory(userAddress);
+    const fetchDashboard = async (xAddress) => {
+        const contract = new ethers.Contract(address, abi, ethersProvider);
+        const data = await contract.inventory(xAddress);
         // const data = await contract.activeEvents();
         const itemsFetched = await Promise.all(
             data.map(async (i) => {
@@ -146,125 +152,7 @@ export default function Login() {
         console.log("dashboard", dashboardItems);
     };
 
-    //
-
-    // const relay = new GelatoRelay();
-
-    // async function host() {
-
-    //     const _tokenURI = await metadata();
-    //     const _supply = formInput.supply;
-
-    //     const contractAddress = "0xAE7e2aD4aAAc74810da24A0E87557304Fe689867";
-    //     const abi = ["function host(uint _supply, string memory _tokenURI)"];
-
-    //     const particleProvider = new ParticleProvider(pn.auth);
-    //     const ethersProvider = new ethers.providers.Web3Provider(
-    //         particleProvider,
-    //         "any"
-    //     );
-    //     const signer = ethersProvider.getSigner();
-
-    //     const contract = new ethers.Contract(contractAddress, abi, signer);
-    //     const { data } = await contract.host(_supply, _tokenURI);
-
-    //     const request = {
-    //         chainId: "80001",
-    //         target: contractAddress,
-    //         data: data,
-    //         user: wAddress,
-    //     };
-
-    //     const relayResponse = await relay.sponsoredCallERC2771(
-    //         request,
-    //         ethersProvider,
-    //         GELATO_API
-    //     );
-
-    //     relayResponse.wait()
-    //     console.log(relayResponse)
-    // }
-
-    // async function claim() {
-
-    //     const _ticketId = prop.tokenId;
-    //     const _email = userInfo.email;
-
-    //     const contractAddress = "0xAE7e2aD4aAAc74810da24A0E87557304Fe689867";
-    //     const abi = ["function claimTicket(uint256 _ticketId, string memory _email)"];
-
-    //     const particleProvider = new ParticleProvider(pn.auth);
-    //     const ethersProvider = new ethers.providers.Web3Provider(
-    //         particleProvider,
-    //         "any"
-    //     );
-    //     const signer = ethersProvider.getSigner();
-
-    //     const contract = new ethers.Contract(contractAddress, abi, signer);
-    //     const { data } = await contract.claimTicket(_ticketId, _email);
-
-    //     const request = {
-    //         chainId: "80001",
-    //         target: contractAddress,
-    //         data: data,
-    //         user: wAddress,
-    //     };
-
-    //     const relayResponse = await relay.sponsoredCallERC2771(
-    //         request,
-    //         ethersProvider,
-    //         GELATO_API
-    //     );
-
-    //     relayResponse.wait()
-    //     console.log(relayResponse)
-    // }
-
-    // async function shortlist() {
-
-    //     const _ticketId = prop.tokenId;
-    //     const _email = userInfo.email;
-
-    //     const contractAddress = "0xAE7e2aD4aAAc74810da24A0E87557304Fe689867";
-    //     const abi = ["function updatShortlist(uint256 _ticketId, string[] memory _shortlist)"];
-
-    //     const particleProvider = new ParticleProvider(pn.auth);
-    //     const ethersProvider = new ethers.providers.Web3Provider(
-    //         particleProvider,
-    //         "any"
-    //     );
-    //     const signer = ethersProvider.getSigner();
-
-    //     const contract = new ethers.Contract(contractAddress, abi, signer);
-    //     const { data } = await contract.claimTicket(formInput.ticketId, formInput.shortlistArray);
-
-    //     const request = {
-    //         chainId: "80001",
-    //         target: contractAddress,
-    //         data: data,
-    //         user: wAddress,
-    //     };
-
-    //     const relayResponse = await relay.sponsoredCallERC2771(
-    //         request,
-    //         ethersProvider,
-    //         GELATO_API
-    //     );
-
-    //     relayResponse.wait()
-    //     console.log(relayResponse)
-    // }
-
-    //
-
-    function debug() {
-        // console.log(wProvider);
-        sendTx();
-    }
-
-    function debug1() {
-        logout();
-    }
+    function debug() {}
 
     return (
         <div>
@@ -273,9 +161,7 @@ export default function Login() {
             ) : (
                 <button onClick={login}>login</button>
             )}
-            {/* <p>{address}</p> */}
-            {/* <button onClick={debug}>check</button>
-            <button onClick={debug1}>check</button> */}
+            {/* <button onClick={debug}>check</button> */}
         </div>
     );
 }

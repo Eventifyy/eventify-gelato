@@ -15,9 +15,6 @@ import {
 import { ParticleProvider } from "@particle-network/provider";
 
 export default function Events() {
-    // const { smartAcc, userInfo, eventItems } = useSelector(
-    //     (state) => state.login
-    // );
 
     const { eventItems, userInfo, wAddress } = useSelector(
         (state) => state.login
@@ -26,30 +23,17 @@ export default function Events() {
     const [loading, setLoading] = useState(null);
 
     const relay = new GelatoRelay();
-    const GELATO_API = process.env.NEXT_PUBLIC_GELATO_API
+    const GELATO_API = process.env.NEXT_PUBLIC_GELATO_API;
 
-    // const pn = new ParticleNetwork({
-    //     projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-    //     clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY,
-    //     appId: process.env.NEXT_PUBLIC_APP_ID,
-    //     chainName: "polygon", //optional: current chain name, default Ethereum.
-    //     chainId: 80001, //optional: current chain id, default 1.
-    //     wallet: {
-    //         //optional: by default, the wallet entry is displayed in the bottom right corner of the webpage.
-    //         displayWalletEntry: true, //show wallet entry when connect particle.
-    //         defaultWalletEntryPosition: WalletEntryPosition.BR, //wallet entry position
-    //         uiMode: "dark", //optional: light or dark, if not set, the default is the same as web auth.
-    //         supportChains: [{ id: 1, name: "Ethereum" }, {id: 80001, name: "Mumbai"}], // optional: web wallet support chains.
-    //         customStyle: {}, //optional: custom wallet style
-    //     },
-    // });
+    console.log("google mail", userInfo?.google_email);
 
     async function claim(prop) {
-
         const _ticketId = prop.tokenId;
         const _email = userInfo.google_email;
 
-        const abi = ["function claimTicket(uint256 _ticketId, string memory _email)"];
+        const abi = [
+            "function claimTicket(uint256 _ticketId, string memory _email)",
+        ];
 
         const particleProvider = new ParticleProvider(pn.auth);
         const ethersProvider = new ethers.providers.Web3Provider(
@@ -57,7 +41,7 @@ export default function Events() {
             "any"
         );
         const signer = ethersProvider.getSigner();
-        
+
         const contract = new ethers.Contract(address, abi, signer);
         const { data } = await contract.claimTicket(_ticketId, _email);
 
@@ -74,8 +58,8 @@ export default function Events() {
             GELATO_API
         );
 
-        relayResponse.wait()
-        console.log(relayResponse)
+        relayResponse.wait();
+        console.log(relayResponse);
 
         console.log("done");
         toast.success("Claimed successfully", {
@@ -90,8 +74,6 @@ export default function Events() {
         });
         setLoading(null);
     }
-    
-    console.log(userInfo.google_email)
 
     function Card(prop) {
         const date = new Date(prop.date);
