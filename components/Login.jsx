@@ -1,13 +1,8 @@
-import { ParticleNetwork, WalletEntryPosition } from "@particle-network/auth";
 import { ParticleProvider } from "@particle-network/provider";
 import { ethers } from "ethers";
-import { useDebugValue, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { address, abi, pn } from "../config";
-import {
-    GelatoRelay,
-    SponsoredCallERC2771Request,
-} from "@gelatonetwork/relay-sdk";
 import {
     setAccount,
     setUser,
@@ -41,12 +36,12 @@ export default function Login() {
         checkLogin();
         fetchEvents();
 
-        if (userInfo == "") {
+        if ( userInfo == "") {
             getUserInfo();
             fetchAccount();
         }
         if (wAddress != "") {
-            console.log(wAddress);
+            console.log("wAddress", wAddress);
             fetchDashboard(wAddress);
         }
     }, [wAddress, userInfo]);
@@ -60,7 +55,7 @@ export default function Login() {
         await pn.auth.login({
             preferredAuthType: "google",
         });
-        console.log(wAddress);
+        console.log("wAddress", wAddress);
         await fetchAccount();
         await getUserInfo();
         await fetchDashboard(wAddress);

@@ -1,6 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import LoginWrapper from "./LoginWrapper";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import Login from "./Login";

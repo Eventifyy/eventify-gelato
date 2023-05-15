@@ -12,7 +12,6 @@ import {
     SponsoredCallERC2771Request,
 } from "@gelatonetwork/relay-sdk";
 import { ParticleProvider } from "@particle-network/provider";
-import { ParticleNetwork, WalletEntryPosition } from "@particle-network/auth";
 
 export default function Host() {
 
