@@ -13,8 +13,14 @@ import {
     SponsoredCallERC2771Request,
 } from "@gelatonetwork/relay-sdk";
 import { ParticleProvider } from "@particle-network/provider";
+import { fetchDashboard } from "@/functions";
+
+import { setDashboardItems } from "../store/index.js";
+import { useDispatch } from "react-redux";
 
 export default function Events() {
+
+    const dispatch = useDispatch();
 
     const { eventItems, userInfo, wAddress } = useSelector(
         (state) => state.login
@@ -60,6 +66,12 @@ export default function Events() {
 
         relayResponse.wait();
         console.log(relayResponse);
+
+
+
+        fetchDashboard().then((resp) => {
+            dispatch(setDashboardItems(resp));
+        });
 
         console.log("done");
         toast.success("Claimed successfully", {

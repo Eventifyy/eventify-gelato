@@ -1,8 +1,5 @@
-import { ParticleProvider } from "@particle-network/provider";
-import { ethers } from "ethers";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { address, abi, pn } from "../config";
+import { pn } from "../config";
 import {
     setAccount,
     setUser,
@@ -11,20 +8,16 @@ import {
 } from "../store/index.js";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { fetchEvents } from "@/functions";
+import { fetchEvents, getEthersProvider } from "@/functions";
+import { fetchDashboard } from "@/functions";
 
 export default function Login() {
     const dispatch = useDispatch();
-
+    console.count("reloading page");
     const [logged, setLogged] = useState(null);
-    const { wAddress, userInfo, eventItems, dashboardItems } = useSelector(
-        (state) => state.login
-    );
+    const { wAddress, userInfo } = useSelector((state) => state.login);
 
-    const ALCHEMY_ID = process.env.NEXT_PUBLIC_ALCHEMY;
-    // const provider = new ethers.providers.JsonRpcProvider(
-    //     `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`
-    // );
+    const ethersProvider = getEthersProvider();
 
     pn.setAuthTheme({
         uiMode: "light",
@@ -33,17 +26,12 @@ export default function Login() {
         modalBorderRadius: 10, // auth & wallet modal border radius. default 10.
     });
 
-    const particleProvider = new ParticleProvider(pn.auth);
-    const ethersProvider = new ethers.providers.Web3Provider(
-        particleProvider,
-        "any"
-    );
-
     useEffect(() => {
         checkLogin();
     }, [wAddress, userInfo]);
 
     useEffect(() => {
+        console.time("myTimer");
         fetchEvents().then((resp) => {
             dispatch(setEventItems(resp));
         });
@@ -53,11 +41,14 @@ export default function Login() {
             if (localStorage.getItem("wAddress")) {
                 let wAddressLocal = localStorage.getItem("wAddress");
                 dispatch(setAccount(wAddressLocal));
-                fetchDashboard(wAddressLocal);
+                fetchDashboard(wAddressLocal).then((resp) => {
+                    dispatch(setDashboardItems(resp));
+                });
             } else {
                 fetchAccount();
             }
         }
+        console.timeEnd("myTimer");
     }, []);
 
     const checkLogin = () => {
@@ -78,7 +69,9 @@ export default function Login() {
     const fetchAccount = async () => {
         const accounts = await ethersProvider.listAccounts();
         dispatch(setAccount(accounts[0]));
-        fetchDashboard(accounts[0]);
+        fetchDashboard(accounts[0]).then((resp) => {
+            dispatch(setDashboardItems(resp));
+        });
         localStorage.setItem("wAddress", accounts[0]);
     };
 
@@ -125,35 +118,35 @@ export default function Login() {
     //     console.log("events", itemsFetched);
     // };
 
-    const fetchDashboard = async (xAddress) => {
-        const contract = new ethers.Contract(address, abi, ethersProvider);
-        const data = await contract.inventory(xAddress);
-        // const data = await contract.activeEvents();
-        const itemsFetched = await Promise.all(
-            data.map(async (i) => {
-                const tokenUri = await contract.uri(i.tokenId.toString());
-                // console.log(tokenUri);
-                const meta = await axios.get(tokenUri + "/");
-                // let price = ethers.utils.formatEther(i.price);
-                let item = {
-                    // price,
-                    name: meta.data.name,
-                    cover: meta.data.cover,
-                    description: meta.data.description,
-                    date: meta.data.date,
-                    venue: meta.data.venue,
-                    supply: i.supply.toNumber(),
-                    tokenId: i.tokenId.toNumber(),
-                    remaining: i.remaining.toNumber(),
-                    host: i.host,
-                };
-                return item;
-            })
-        );
+    // const fetchDashboard = async (xAddress) => {
+    //     const contract = new ethers.Contract(address, abi, ethersProvider);
+    //     const data = await contract.inventory(xAddress);
+    //     // const data = await contract.activeEvents();
+    //     const itemsFetched = await Promise.all(
+    //         data.map(async (i) => {
+    //             const tokenUri = await contract.uri(i.tokenId.toString());
+    //             // console.log(tokenUri);
+    //             const meta = await axios.get(tokenUri + "/");
+    //             // let price = ethers.utils.formatEther(i.price);
+    //             let item = {
+    //                 // price,
+    //                 name: meta.data.name,
+    //                 cover: meta.data.cover,
+    //                 description: meta.data.description,
+    //                 date: meta.data.date,
+    //                 venue: meta.data.venue,
+    //                 supply: i.supply.toNumber(),
+    //                 tokenId: i.tokenId.toNumber(),
+    //                 remaining: i.remaining.toNumber(),
+    //                 host: i.host,
+    //             };
+    //             return item;
+    //         })
+    //     );
 
-        dispatch(setDashboardItems(itemsFetched));
-        console.log("dashboard", itemsFetched);
-    };
+    //     dispatch(setDashboardItems(itemsFetched));
+    //     console.log("dashboard", itemsFetched);
+    // };
 
     function debug() {}
 

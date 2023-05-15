@@ -18,6 +18,7 @@ import { setEventItems } from "../store/index.js";
 import { useDispatch } from "react-redux";
 
 export default function Host() {
+    
     const dispatch = useDispatch();
 
     const { wAddress } = useSelector((state) => state.login);
